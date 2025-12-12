@@ -47,6 +47,11 @@ import TrafficOpsANPRScreen from './screens/police/TrafficOpsANPRScreen';
 import IncidentReportingScreen from './screens/police/IncidentReportingScreen';
 import TeamGridRadioScreen from './screens/police/TeamGridRadioScreen';
 import GlobalDatabaseSearchScreen from './screens/police/GlobalDatabaseSearchScreen';
+import DispatcherMapScreen from './screens/police/DispatcherMapScreen';
+import WriteForCitizenScreen from './screens/police/WriteForCitizenScreen';
+import StatementFormScreen from './screens/police/StatementFormScreen';
+import TrafficTicketScreen from './screens/police/TrafficTicketScreen';
+import VehicleSearchScreen from './screens/police/VehicleSearchScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -96,6 +101,11 @@ const App: React.FC = () => {
             <Stack.Screen name="IncidentReporting" component={IncidentReportingScreen} />
             <Stack.Screen name="TeamGridRadio" component={TeamGridRadioScreen} />
             <Stack.Screen name="GlobalDatabaseSearch" component={GlobalDatabaseSearchScreen} />
+            <Stack.Screen name="DispatcherMap" component={DispatcherMapScreen} />
+            <Stack.Screen name="WriteForCitizen" component={WriteForCitizenScreen} />
+            <Stack.Screen name="StatementForm" component={StatementFormScreen} />
+            <Stack.Screen name="TrafficTicket" component={TrafficTicketScreen} />
+            <Stack.Screen name="VehicleSearch" component={VehicleSearchScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaProvider>

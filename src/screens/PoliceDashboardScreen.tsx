@@ -277,18 +277,32 @@ const PoliceDashboardScreen: React.FC = () => {
               icon={<ShieldIcon size={20} color="#3B82F6" />} 
               label="Dashboard" 
               isActive 
+              onPress={closeSidebar}
             />
             <MenuItem 
               icon={<MapIcon size={20} color="#94A3B8" />} 
               label="Live Map" 
+              onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('DispatcherMap'), 300); }}
             />
             <MenuItem 
               icon={<AlertIcon size={20} color="#94A3B8" />} 
               label="Dispatch" 
+              onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('DispatcherMap'), 300); }}
             />
             <MenuItem 
               icon={<FileIcon size={20} color="#94A3B8" />} 
               label="Reports" 
+              onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('IncidentReporting'), 300); }}
+            />
+            <MenuItem 
+              icon={<CarIcon size={20} color="#94A3B8" />} 
+              label="Traffic Ops" 
+              onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('VehicleSearch'), 300); }}
+            />
+            <MenuItem 
+              icon={<HandcuffsIcon size={20} color="#94A3B8" />} 
+              label="Write Statement" 
+              onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('WriteForCitizen'), 300); }}
             />
           </View>
 
@@ -358,36 +372,42 @@ const PoliceDashboardScreen: React.FC = () => {
             title="Live Map"
             subtitle="View patrol area"
             color="#3B82F6"
+            onPress={() => navigation.navigate('DispatcherMap')}
           />
           <QuickAction
             icon={<AlertIcon size={28} color="#FFFFFF" />}
             title="Dispatch"
             subtitle="Active calls"
             color="#EF4444"
+            onPress={() => navigation.navigate('DispatcherMap')}
           />
           <QuickAction
             icon={<CarIcon size={28} color="#FFFFFF" />}
             title="Traffic"
             subtitle="Issue tickets"
             color="#8B5CF6"
+            onPress={() => navigation.navigate('VehicleSearch')}
           />
           <QuickAction
             icon={<RadioIcon size={28} color="#FFFFFF" />}
             title="Radio"
             subtitle="Communications"
             color="#10B981"
+            onPress={() => navigation.navigate('TeamGridRadio')}
           />
           <QuickAction
             icon={<FileIcon size={28} color="#FFFFFF" />}
             title="Reports"
             subtitle="File reports"
             color="#F59E0B"
+            onPress={() => navigation.navigate('IncidentReporting')}
           />
           <QuickAction
             icon={<UserIcon size={28} color="#FFFFFF" />}
-            title="Profile"
-            subtitle="Settings"
+            title="Statement"
+            subtitle="Write for citizen"
             color="#6366F1"
+            onPress={() => navigation.navigate('WriteForCitizen')}
           />
         </View>
 
