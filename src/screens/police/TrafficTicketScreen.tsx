@@ -980,6 +980,14 @@ For questions, please contact the Traffic Division.
       >
         <View style={styles.paymentModalOverlay}>
           <View style={styles.paymentModal}>
+            {/* Close Button */}
+            <TouchableOpacity
+              style={styles.paymentCloseBtn}
+              onPress={handleIssueWithoutPayment}
+            >
+              <FontAwesomeIcon icon={faTimesCircle} size={28} color="#94A3B8" />
+            </TouchableOpacity>
+            
             {/* Header */}
             <View style={styles.paymentModalHeader}>
               <FontAwesomeIcon icon={faCheckCircle} size={40} color="#10B981" />
@@ -1782,6 +1790,13 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     maxHeight: '90%',
     paddingBottom: 34,
+  },
+  paymentCloseBtn: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    zIndex: 10,
+    padding: 4,
   },
   paymentModalHeader: {
     alignItems: 'center',
