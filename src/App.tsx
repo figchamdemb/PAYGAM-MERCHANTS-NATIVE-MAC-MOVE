@@ -42,6 +42,12 @@ import FireEmergencyResponseScreen from './screens/emergency/FireEmergencyRespon
 import AmbulanceEmergencyResponseScreen from './screens/emergency/AmbulanceEmergencyResponseScreen';
 import ImmigrationEmergencyResponseScreen from './screens/emergency/ImmigrationEmergencyResponseScreen';
 
+// Police-Specific Feature Screens
+import TrafficOpsANPRScreen from './screens/police/TrafficOpsANPRScreen';
+import IncidentReportingScreen from './screens/police/IncidentReportingScreen';
+import TeamGridRadioScreen from './screens/police/TeamGridRadioScreen';
+import GlobalDatabaseSearchScreen from './screens/police/GlobalDatabaseSearchScreen';
+
 const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
@@ -84,6 +90,12 @@ const App: React.FC = () => {
             {/* Immigration Emergency Flow */}
             <Stack.Screen name="ImmigrationTaskDetails" component={ImmigrationTaskDetailsScreen} />
             <Stack.Screen name="ImmigrationEmergencyResponse" component={ImmigrationEmergencyResponseScreen} />
+            
+            {/* Police Feature Screens */}
+            <Stack.Screen name="TrafficOpsANPR" component={TrafficOpsANPRScreen} />
+            <Stack.Screen name="IncidentReporting" component={IncidentReportingScreen} />
+            <Stack.Screen name="TeamGridRadio" component={TeamGridRadioScreen} />
+            <Stack.Screen name="GlobalDatabaseSearch" component={GlobalDatabaseSearchScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaProvider>
