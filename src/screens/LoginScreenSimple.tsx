@@ -158,14 +158,34 @@ const LoginScreenSimple: React.FC = () => {
         })
       ).start();
 
-      // Navigate to Dashboard after 3 seconds
+      // Navigate to appropriate Dashboard based on MFA code after 3 seconds
       const timer = setTimeout(() => {
-        navigation.replace('Dashboard');
+        // Route based on MFA code
+        let targetScreen = 'Dashboard'; // Default fallback
+        
+        switch (mfaCode) {
+          case '123456':
+            targetScreen = 'PoliceDashboard';
+            break;
+          case '111111':
+            targetScreen = 'FireDashboard';
+            break;
+          case '222222':
+            targetScreen = 'ImmigrationDashboard';
+            break;
+          case '000006':
+            targetScreen = 'AmbulanceDashboard';
+            break;
+          default:
+            targetScreen = 'Dashboard';
+        }
+        
+        navigation.replace(targetScreen);
       }, 3000);
 
       return () => clearTimeout(timer);
     }
-  }, [showSuccess, navigation, successCheckAnim, successPingAnim, loadingAnim]);
+  }, [showSuccess, navigation, mfaCode, successCheckAnim, successPingAnim, loadingAnim]);
 
   const handleAuthenticate = () => {
     if (!badgeId.trim()) {
