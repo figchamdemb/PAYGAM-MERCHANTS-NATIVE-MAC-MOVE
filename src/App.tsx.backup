@@ -1,0 +1,77 @@
+/**
+ * ✅ MAIN APP COMPONENT
+ *
+ * Root component that wraps the entire application
+ * Provides Redux store, navigation, and theme
+ */
+
+import React, { useEffect } from 'react';
+import { StatusBar, BackHandler, Alert } from 'react-native';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { store, persistor } from './store';
+import { AppNavigator } from './navigation';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
+
+// Inner app component that uses theme
+const AppContent: React.FC = () => {
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    // Handle hardware back button press
+    const backAction = () => {
+      Alert.alert(
+        'Exit E-GOV-GUARDS-PORTAL',
+        'Are you sure you want to exit the app?',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          {
+            text: 'Exit',
+            onPress: () => BackHandler.exitApp(),
+            style: 'destructive',
+          },
+        ],
+        { cancelable: true }
+      );
+      return true; // Prevent default back behavior
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
+  return (
+    <>
+      <StatusBar
+        barStyle={theme.colors.statusBarStyle}
+        backgroundColor={theme.colors.statusBar}
+      />
+      <AppNavigator />
+    </>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <AppContent />
+          </PersistGate>
+        </Provider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
+  );
+};
+
+export default App;
