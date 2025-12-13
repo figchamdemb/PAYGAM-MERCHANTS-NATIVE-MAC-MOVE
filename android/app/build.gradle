@@ -77,8 +77,8 @@ android {
         applicationId "com.egovgambia.patrol"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 4
-        versionName "1.0.3"
+        versionCode 6
+        versionName "1.0.6"
 
         // Include ARM ABIs for real devices
         ndk {

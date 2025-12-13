@@ -15,6 +15,8 @@ import {
   ScrollView,
   Animated,
   Dimensions,
+  Linking,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -104,6 +106,12 @@ const VitalsIcon: React.FC<{ size?: number; color?: string }> = ({ size = 24, co
 const StretcherIcon: React.FC<{ size?: number; color?: string }> = ({ size = 24, color = '#FFFFFF' }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
     <Path d="M21.5 10.5h-1V8h-2v2.5h-13v-2H4v2H2.5c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1H4v1.5c0 .55.45 1 1 1h1c.55 0 1-.45 1-1V15.5h10v1.5c0 .55.45 1 1 1h1c.55 0 1-.45 1-1V15.5h1.5c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1z" />
+  </Svg>
+);
+
+const FingerprintIcon: React.FC<{ size?: number; color?: string }> = ({ size = 24, color = '#FFFFFF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.68-.2-.13-.24-.04-.55.2-.68C7.82 2.52 9.86 2 12.01 2c2.13 0 3.99.47 6.03 1.52.25.13.34.43.21.67-.09.18-.26.28-.44.28zM3.5 9.72c-.1 0-.2-.03-.29-.09-.23-.16-.28-.47-.12-.7.99-1.4 2.25-2.5 3.75-3.27C9.98 4.04 14 4.03 17.15 5.65c1.5.77 2.76 1.86 3.75 3.25.16.22.11.54-.12.7-.23.16-.54.11-.7-.12-.9-1.26-2.04-2.25-3.39-2.94-2.87-1.47-6.54-1.47-9.4.01-1.36.7-2.5 1.7-3.4 2.96-.08.14-.23.21-.39.21zm6.25 12.07c-.13 0-.26-.05-.35-.15-.87-.87-1.34-1.43-2.01-2.64-.69-1.23-1.05-2.73-1.05-4.34 0-2.97 2.54-5.39 5.66-5.39s5.66 2.42 5.66 5.39c0 .28-.22.5-.5.5s-.5-.22-.5-.5c0-2.42-2.09-4.39-4.66-4.39-2.57 0-4.66 1.97-4.66 4.39 0 1.44.32 2.77.93 3.85.64 1.15 1.08 1.64 1.85 2.42.19.2.19.51 0 .71-.11.1-.24.15-.37.15zm7.17-1.85c-1.19 0-2.24-.3-3.1-.89-1.49-1.01-2.38-2.65-2.38-4.39 0-.28.22-.5.5-.5s.5.22.5.5c0 1.41.72 2.74 1.94 3.56.71.48 1.54.71 2.54.71.24 0 .64-.03 1.04-.1.27-.05.53.13.58.41.05.27-.13.53-.41.58-.57.11-1.07.12-1.21.12zM14.91 22c-.04 0-.09-.01-.13-.02-1.59-.44-2.63-1.03-3.72-2.1-1.4-1.39-2.17-3.24-2.17-5.22 0-1.62 1.38-2.94 3.08-2.94 1.7 0 3.08 1.32 3.08 2.94 0 1.07.93 1.94 2.08 1.94s2.08-.87 2.08-1.94c0-3.77-3.25-6.83-7.25-6.83-2.84 0-5.44 1.58-6.61 4.03-.39.81-.59 1.76-.59 2.8 0 .78.07 2.01.67 3.61.1.26-.03.55-.29.64-.26.1-.55-.04-.64-.29-.49-1.31-.73-2.61-.73-3.96 0-1.2.23-2.29.68-3.24 1.33-2.79 4.28-4.6 7.51-4.6 4.55 0 8.25 3.51 8.25 7.83 0 1.62-1.38 2.94-3.08 2.94s-3.08-1.32-3.08-2.94c0-1.07-.93-1.94-2.08-1.94s-2.08.87-2.08 1.94c0 1.71.66 3.31 1.87 4.51.95.94 1.86 1.46 3.27 1.85.27.07.42.35.35.61-.05.23-.26.38-.47.38z" />
   </Svg>
 );
 
@@ -232,6 +240,32 @@ const AmbulanceDashboardScreen: React.FC = () => {
     }, 300);
   };
 
+  // Open fingerprint scanner app
+  const openFingerprintApp = async () => {
+    try {
+      const url = 'intent://scan/#Intent;scheme=fingerprint;package=com.fingerprint.scanner;end';
+      const canOpen = await Linking.canOpenURL(url);
+      
+      if (canOpen) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert(
+          'Fingerprint App',
+          'No fingerprint scanner app found. Would you like to search for one?',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { 
+              text: 'Search', 
+              onPress: () => Linking.openURL('market://search?q=fingerprint%20scanner') 
+            },
+          ]
+        );
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Could not open fingerprint app. Please install a fingerprint scanner app.');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
@@ -262,15 +296,15 @@ const AmbulanceDashboardScreen: React.FC = () => {
 
           <View style={styles.menuSection}>
             <Text style={styles.menuSectionTitle}>NAVIGATION</Text>
-            <MenuItem icon={<AmbulanceIcon size={20} color="#10B981" />} label="Dashboard" isActive />
-            <MenuItem icon={<MapIcon size={20} color="#94A3B8" />} label="Response Map" />
-            <MenuItem icon={<AlertIcon size={20} color="#94A3B8" />} label="Emergency Calls" />
-            <MenuItem icon={<FileIcon size={20} color="#94A3B8" />} label="Patient Reports" />
+            <MenuItem icon={<AmbulanceIcon size={20} color="#10B981" />} label="Dashboard" isActive onPress={closeSidebar} />
+            <MenuItem icon={<MapIcon size={20} color="#94A3B8" />} label="Response Map" onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('AmbulanceDispatcher'), 300); }} />
+            <MenuItem icon={<AlertIcon size={20} color="#94A3B8" />} label="Emergency Calls" onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('AmbulanceDispatcher'), 300); }} />
+            <MenuItem icon={<FileIcon size={20} color="#94A3B8" />} label="Patient Reports" onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('AmbulancePatientReport'), 300); }} />
           </View>
 
           <View style={styles.menuSection}>
             <Text style={styles.menuSectionTitle}>ACCOUNT</Text>
-            <MenuItem icon={<UserIcon size={20} color="#94A3B8" />} label="Profile" />
+            <MenuItem icon={<UserIcon size={20} color="#94A3B8" />} label="Profile" onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('OfficerProfile', { department: 'ambulance' }), 300); }} />
             <MenuItem icon={<SettingsIcon size={20} color="#94A3B8" />} label="Settings" />
           </View>
 
@@ -318,6 +352,14 @@ const AmbulanceDashboardScreen: React.FC = () => {
           <StatusCard label="Transported" value="6" color="#10B981" />
         </View>
 
+        {/* Fingerprint Scanner Button */}
+        <TouchableOpacity style={styles.fingerprintButton} onPress={openFingerprintApp} activeOpacity={0.8}>
+          <LinearGradient colors={['#8B5CF6', '#7C3AED']} style={styles.fingerprintGradient}>
+            <FingerprintIcon size={24} color="#FFFFFF" />
+            <Text style={styles.fingerprintText}>Open Fingerprint App</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
         {/* Quick Actions */}
         <Text style={styles.sectionTitle}>Quick Actions</Text>
         <View style={styles.quickActionsGrid}>
@@ -326,36 +368,42 @@ const AmbulanceDashboardScreen: React.FC = () => {
             title="Response"
             subtitle="Active locations"
             color="#10B981"
+            onPress={() => navigation.navigate('AmbulanceDispatcher')}
           />
           <QuickAction
             icon={<AlertIcon size={28} color="#FFFFFF" />}
             title="Dispatch"
             subtitle="Emergency calls"
             color="#EF4444"
+            onPress={() => navigation.navigate('AmbulanceDispatcher')}
           />
           <QuickAction
             icon={<HospitalIcon size={28} color="#FFFFFF" />}
             title="Hospitals"
             subtitle="Nearby facilities"
             color="#3B82F6"
+            onPress={() => navigation.navigate('AmbulanceDispatcher')}
           />
           <QuickAction
             icon={<VitalsIcon size={28} color="#FFFFFF" />}
             title="Vitals"
             subtitle="Patient data"
             color="#8B5CF6"
+            onPress={() => navigation.navigate('AmbulancePatientReport')}
           />
           <QuickAction
             icon={<RadioIcon size={28} color="#FFFFFF" />}
             title="Radio"
             subtitle="Communications"
             color="#F59E0B"
+            onPress={() => navigation.navigate('AmbulanceTeamRadio')}
           />
           <QuickAction
             icon={<FileIcon size={28} color="#FFFFFF" />}
             title="Reports"
             subtitle="Patient care"
             color="#6366F1"
+            onPress={() => navigation.navigate('AmbulancePatientReport')}
           />
         </View>
 
@@ -463,6 +511,9 @@ const styles = StyleSheet.create({
   departmentBadge: { marginBottom: 20, borderRadius: 12, overflow: 'hidden' },
   departmentGradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, paddingHorizontal: 20 },
   departmentText: { fontSize: 14, fontWeight: '700', color: '#FFFFFF', letterSpacing: 1, marginLeft: 10 },
+  fingerprintButton: { marginBottom: 20, borderRadius: 12, overflow: 'hidden' },
+  fingerprintGradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 14, paddingHorizontal: 20 },
+  fingerprintText: { fontSize: 15, fontWeight: '700', color: '#FFFFFF', marginLeft: 12 },
   statusRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 28 },
   statusCard: { flex: 1, backgroundColor: 'rgba(30,41,59,0.6)', borderRadius: 12, padding: 16, marginHorizontal: 4, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(71,85,105,0.5)' },
   statusDot: { width: 8, height: 8, borderRadius: 4, marginBottom: 8 },

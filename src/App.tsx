@@ -52,6 +52,26 @@ import WriteForCitizenScreen from './screens/police/WriteForCitizenScreen';
 import StatementFormScreen from './screens/police/StatementFormScreen';
 import TrafficTicketScreen from './screens/police/TrafficTicketScreen';
 import VehicleSearchScreen from './screens/police/VehicleSearchScreen';
+import SearchCasesScreen from './screens/police/SearchCasesScreen';
+
+// Fire-Specific Feature Screens
+import FireDispatcherScreen from './screens/fire/FireDispatcherScreen';
+import FireIncidentReportScreen from './screens/fire/FireIncidentReportScreen';
+import FireTeamRadioScreen from './screens/fire/FireTeamRadioScreen';
+
+// Ambulance-Specific Feature Screens
+import AmbulanceDispatcherScreen from './screens/ambulance/AmbulanceDispatcherScreen';
+import AmbulancePatientReportScreen from './screens/ambulance/AmbulancePatientReportScreen';
+import AmbulanceTeamRadioScreen from './screens/ambulance/AmbulanceTeamRadioScreen';
+
+// Immigration-Specific Feature Screens
+import ImmigrationDispatcherScreen from './screens/immigration/ImmigrationDispatcherScreen';
+import ImmigrationCaseReportScreen from './screens/immigration/ImmigrationCaseReportScreen';
+import ImmigrationTeamRadioScreen from './screens/immigration/ImmigrationTeamRadioScreen';
+import PermitVisaLookupScreen from './screens/immigration/PermitVisaLookupScreen';
+
+// Officer Profile Screen (shared across all departments)
+import OfficerProfileScreen from './screens/OfficerProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -106,6 +126,26 @@ const App: React.FC = () => {
             <Stack.Screen name="StatementForm" component={StatementFormScreen} />
             <Stack.Screen name="TrafficTicket" component={TrafficTicketScreen} />
             <Stack.Screen name="VehicleSearch" component={VehicleSearchScreen} />
+            <Stack.Screen name="SearchCases" component={SearchCasesScreen} />
+            
+            {/* Fire Feature Screens */}
+            <Stack.Screen name="FireDispatcher" component={FireDispatcherScreen} />
+            <Stack.Screen name="FireIncidentReport" component={FireIncidentReportScreen} />
+            <Stack.Screen name="FireTeamRadio" component={FireTeamRadioScreen} />
+            
+            {/* Ambulance Feature Screens */}
+            <Stack.Screen name="AmbulanceDispatcher" component={AmbulanceDispatcherScreen} />
+            <Stack.Screen name="AmbulancePatientReport" component={AmbulancePatientReportScreen} />
+            <Stack.Screen name="AmbulanceTeamRadio" component={AmbulanceTeamRadioScreen} />
+            
+            {/* Immigration Feature Screens */}
+            <Stack.Screen name="ImmigrationDispatcher" component={ImmigrationDispatcherScreen} />
+            <Stack.Screen name="ImmigrationCaseReport" component={ImmigrationCaseReportScreen} />
+            <Stack.Screen name="ImmigrationTeamRadio" component={ImmigrationTeamRadioScreen} />
+            <Stack.Screen name="PermitVisaLookup" component={PermitVisaLookupScreen} />
+            
+            {/* Shared Screens */}
+            <Stack.Screen name="OfficerProfile" component={OfficerProfileScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaProvider>
