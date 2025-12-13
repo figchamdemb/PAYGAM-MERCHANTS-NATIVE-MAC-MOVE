@@ -139,6 +139,12 @@ const FingerprintIcon: React.FC<{ size?: number; color?: string }> = ({ size = 2
   </Svg>
 );
 
+const QRCodeIcon: React.FC<{ size?: number; color?: string }> = ({ size = 24, color = '#FFFFFF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2zM15 15h2v2h-2zM13 17h2v2h-2zM17 13h2v2h-2zM19 15h2v2h-2zM17 17h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z" />
+  </Svg>
+);
+
 const UserIcon: React.FC<{ size?: number; color?: string }> = ({ size = 24, color = '#FFFFFF' }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
     <Path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
@@ -304,13 +310,26 @@ const ImmigrationDashboardScreen: React.FC = () => {
   };
 
   const handleSignOut = () => {
-    closeSidebar();
-    setTimeout(() => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' }],
-      });
-    }, 300);
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Yes, Sign Out',
+          style: 'destructive',
+          onPress: () => {
+            closeSidebar();
+            setTimeout(() => {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+              });
+            }, 300);
+          },
+        },
+      ]
+    );
   };
 
   // Open fingerprint scanner app
@@ -407,8 +426,14 @@ const ImmigrationDashboardScreen: React.FC = () => {
               onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('OfficerProfile', { department: 'immigration' }), 300); }}
             />
             <MenuItem 
+              icon={<QRCodeIcon size={18} color="#94A3B8" />} 
+              label="QR Scanner" 
+              onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('QRScanner', { department: 'immigration' }), 300); }}
+            />
+            <MenuItem 
               icon={<SettingsIcon size={18} color="#94A3B8" />} 
               label="Settings" 
+              onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('Settings', { department: 'immigration' }), 300); }}
             />
             <MenuItem 
               icon={<HelpIcon size={18} color="#94A3B8" />} 

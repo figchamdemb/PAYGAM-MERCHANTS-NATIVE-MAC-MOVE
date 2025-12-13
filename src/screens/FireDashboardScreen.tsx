@@ -109,6 +109,12 @@ const FingerprintIcon: React.FC<{ size?: number; color?: string }> = ({ size = 2
   </Svg>
 );
 
+const QRCodeIcon: React.FC<{ size?: number; color?: string }> = ({ size = 24, color = '#FFFFFF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2zM15 15h2v2h-2zM13 17h2v2h-2zM17 13h2v2h-2zM19 15h2v2h-2zM17 17h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z" />
+  </Svg>
+);
+
 // Quick Action Card Component
 interface QuickActionProps {
   icon: React.ReactNode;
@@ -225,13 +231,26 @@ const FireDashboardScreen: React.FC = () => {
   };
 
   const handleSignOut = () => {
-    closeSidebar();
-    setTimeout(() => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' }],
-      });
-    }, 300);
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Yes, Sign Out',
+          style: 'destructive',
+          onPress: () => {
+            closeSidebar();
+            setTimeout(() => {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+              });
+            }, 300);
+          },
+        },
+      ]
+    );
   };
 
   // Open fingerprint scanner app
@@ -309,7 +328,8 @@ const FireDashboardScreen: React.FC = () => {
           <View style={styles.menuSection}>
             <Text style={styles.menuSectionTitle}>ACCOUNT</Text>
             <MenuItem icon={<UserIcon size={20} color="#94A3B8" />} label="Profile" onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('OfficerProfile', { department: 'fire' }), 300); }} />
-            <MenuItem icon={<SettingsIcon size={20} color="#94A3B8" />} label="Settings" />
+            <MenuItem icon={<QRCodeIcon size={20} color="#94A3B8" />} label="QR Scanner" onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('QRScanner', { department: 'fire' }), 300); }} />
+            <MenuItem icon={<SettingsIcon size={20} color="#94A3B8" />} label="Settings" onPress={() => { closeSidebar(); setTimeout(() => navigation.navigate('Settings', { department: 'fire' }), 300); }} />
           </View>
 
           <View style={styles.menuFooter}>

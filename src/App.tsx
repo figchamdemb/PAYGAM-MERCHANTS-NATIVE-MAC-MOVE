@@ -70,8 +70,10 @@ import ImmigrationCaseReportScreen from './screens/immigration/ImmigrationCaseRe
 import ImmigrationTeamRadioScreen from './screens/immigration/ImmigrationTeamRadioScreen';
 import PermitVisaLookupScreen from './screens/immigration/PermitVisaLookupScreen';
 
-// Officer Profile Screen (shared across all departments)
+// Shared Screens (all departments)
 import OfficerProfileScreen from './screens/OfficerProfileScreen';
+import SettingsScreen from './screens/SettingsScreen';
+import QRScannerScreen from './screens/QRScannerScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -146,6 +148,8 @@ const App: React.FC = () => {
             
             {/* Shared Screens */}
             <Stack.Screen name="OfficerProfile" component={OfficerProfileScreen} />
+            <Stack.Screen name="Settings" component={SettingsScreen} />
+            <Stack.Screen name="QRScanner" component={QRScannerScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaProvider>
