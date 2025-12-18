@@ -1,6 +1,6 @@
 {
-  "name": "egove-patrol",
-  "version": "1.0.0",
+  "name": "paygam-merchant-app",
+  "version": "0.0.1",
   "description": "EGOVE Patrol Mobile App - React Native CLI",
   "main": "index.js",
   "private": true,

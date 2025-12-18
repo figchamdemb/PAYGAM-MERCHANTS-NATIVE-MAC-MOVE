@@ -14,10 +14,10 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../../navigation/types';
 
-type SelectAgencyScreenNavigationProp = NativeStackNavigationProp<MainStackParamList>;
+type SelectMerchantTypeScreenNavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
-interface ServiceDepartment {
-  id: 'POLICE' | 'FIRE' | 'AMBULANCE' | 'IMMIGRATION';
+interface MerchantType {
+  id: 'GENERAL' | 'CORPORATE' | 'FUEL' | 'GOVERNMENT';
   name: string;
   icon: string;
   color: string;
@@ -27,60 +27,60 @@ interface ServiceDepartment {
   route: keyof MainStackParamList;
 }
 
-const SERVICE_DEPARTMENTS: ServiceDepartment[] = [
+const MERCHANT_TYPES: MerchantType[] = [
   {
-    id: 'POLICE',
-    name: 'Police Dept.',
-    icon: 'shield-alt',
-    color: '#1E40AF',
-    borderColor: '#2563EB',
-    bgColor: '#DBEAFE',
-    description: 'Law Enforcement',
-    route: 'PolicePatrolDashboard',
-  },
-  {
-    id: 'FIRE',
-    name: 'Fire & Rescue',
-    icon: 'fire-extinguisher',
-    color: '#DC2626',
-    borderColor: '#DC2626',
-    bgColor: '#FEE2E2',
-    description: 'Emergency Response',
-    route: 'FirePatrolDashboard',
-  },
-  {
-    id: 'AMBULANCE',
-    name: 'Medical EMS',
-    icon: 'heartbeat',
+    id: 'GENERAL',
+    name: 'General Merchant',
+    icon: 'store',
     color: '#059669',
     borderColor: '#10B981',
     bgColor: '#D1FAE5',
-    description: 'Paramedic Services',
-    route: 'AmbulancePatrolDashboard',
+    description: 'Retail & Services',
+    route: 'GeneralMerchantDashboard',
   },
   {
-    id: 'IMMIGRATION',
-    name: 'Immigration',
-    icon: 'passport',
+    id: 'CORPORATE',
+    name: 'Corporate Merchant',
+    icon: 'building',
+    color: '#DC2626',
+    borderColor: '#DC2626',
+    bgColor: '#FEE2E2',
+    description: 'Business Payments',
+    route: 'CorporateMerchantDashboard',
+  },
+  {
+    id: 'FUEL',
+    name: 'Fuel Merchant',
+    icon: 'gas-pump',
     color: '#4F46E5',
     borderColor: '#6366F1',
     bgColor: '#E0E7FF',
-    description: 'Border Control',
-    route: 'ImmigrationDashboard',
+    description: 'Fuel Station',
+    route: 'FuelMerchantDashboard',
+  },
+  {
+    id: 'GOVERNMENT',
+    name: 'Government Merchant',
+    icon: 'landmark',
+    color: '#1E40AF',
+    borderColor: '#2563EB',
+    bgColor: '#DBEAFE',
+    description: 'Government Services',
+    route: 'GovernmentMerchantDashboard',
   },
 ];
 
 const SelectAgencyScreen = () => {
-  const navigation = useNavigation<SelectAgencyScreenNavigationProp>();
+  const navigation = useNavigation<SelectMerchantTypeScreenNavigationProp>();
 
-  const handleServiceSelect = (service: ServiceDepartment) => {
-    // Use type assertion to avoid strict typing issues with dynamic route names
-    (navigation as any).navigate(service.route);
+  const handleMerchantSelect = (merchant: MerchantType) => {
+    // Navigate to Login screen with selected merchant type
+    (navigation as any).navigate('Login', { merchantType: merchant.route });
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#1E40AF" />
+      <StatusBar barStyle="light-content" backgroundColor="#293454" />
 
       <View style={styles.header}>
         <View style={styles.statusBar}>
@@ -107,11 +107,11 @@ const SelectAgencyScreen = () => {
         <View style={styles.profileSection}>
           <View style={styles.profileLeft}>
             <View style={styles.profileAvatar}>
-              <Icon name="user-shield" size={14} color="#FFFFFF" solid />
+              <Icon name="user" size={14} color="#FFFFFF" solid />
             </View>
             <View>
-              <Text style={styles.profileId}>OFFICER ID: 8842</Text>
-              <Text style={styles.profileName}>Sgt. Anderson</Text>
+              <Text style={styles.profileId}>MERCHANT ID: 8842</Text>
+              <Text style={styles.profileName}>Welcome Back</Text>
             </View>
           </View>
           <TouchableOpacity style={styles.notificationButton}>
@@ -121,8 +121,8 @@ const SelectAgencyScreen = () => {
         </View>
 
         <View style={styles.titleSection}>
-          <Text style={styles.title}>Select Agency</Text>
-          <Text style={styles.subtitle}>Choose a department to access the patrol dashboard.</Text>
+          <Text style={styles.title}>Select Merchant Type</Text>
+          <Text style={styles.subtitle}>Choose your business type to access dashboard.</Text>
         </View>
       </View>
 
@@ -132,61 +132,61 @@ const SelectAgencyScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.grid}>
-          {SERVICE_DEPARTMENTS.map((service) => (
+          {MERCHANT_TYPES.map((merchant) => (
             <TouchableOpacity
-              key={service.id}
+              key={merchant.id}
               style={styles.serviceCard}
-              onPress={() => handleServiceSelect(service)}
+              onPress={() => handleMerchantSelect(merchant)}
               activeOpacity={0.7}
             >
-              <View style={[styles.serviceBorder, { backgroundColor: service.borderColor }]} />
+              <View style={[styles.serviceBorder, { backgroundColor: merchant.borderColor }]} />
               <View style={styles.serviceContent}>
-                <View style={[styles.serviceIcon, { backgroundColor: service.bgColor }]}>
-                  <Icon name={service.icon} size={18} color={service.color} solid />
+                <View style={[styles.serviceIcon, { backgroundColor: merchant.bgColor }]}>
+                  <Icon name={merchant.icon} size={18} color={merchant.color} solid />
                 </View>
                 <View style={styles.serviceInfo}>
-                  <Text style={styles.serviceName}>{service.name}</Text>
-                  <Text style={styles.serviceDesc}>{service.description}</Text>
+                  <Text style={styles.serviceName}>{merchant.name}</Text>
+                  <Text style={styles.serviceDesc}>{merchant.description}</Text>
                 </View>
               </View>
               <View style={styles.serviceChevron}>
                 <Icon name="chevron-right" size={10} color="#CBD5E1" solid />
               </View>
             </TouchableOpacity>
-          ))}
-        </View>
+          ))
+        }</View>
 
         <View style={styles.statusSection}>
           <View style={styles.statusHeader}>
-            <Text style={styles.statusHeaderText}>SYSTEM STATUS</Text>
+            <Text style={styles.statusHeaderText}>ACCOUNT STATUS</Text>
             <View style={styles.operationalBadge}>
-              <Text style={styles.operationalText}>Operational</Text>
+              <Text style={styles.operationalText}>Active</Text>
             </View>
           </View>
           <View style={styles.statusCards}>
             <View style={styles.statusCard}>
-              <Icon name="server" size={16} color="#10B981" />
-              <Text style={styles.statusCardLabel}>Server</Text>
-              <Text style={styles.statusCardValue}>Online</Text>
+              <Icon name="wallet" size={16} color="#10B981" solid />
+              <Text style={styles.statusCardLabel}>Balance</Text>
+              <Text style={styles.statusCardValue}>GMD 0.00</Text>
             </View>
             <View style={styles.statusCard}>
-              <Icon name="database" size={16} color="#10B981" />
-              <Text style={styles.statusCardLabel}>Database</Text>
-              <Text style={styles.statusCardValue}>Synced</Text>
+              <Icon name="exchange-alt" size={16} color="#10B981" />
+              <Text style={styles.statusCardLabel}>Transactions</Text>
+              <Text style={styles.statusCardValue}>0</Text>
             </View>
             <View style={styles.statusCard}>
-              <Icon name="broadcast-tower" size={16} color="#10B981" />
-              <Text style={styles.statusCardLabel}>Radio</Text>
-              <Text style={styles.statusCardValue}>Active</Text>
+              <Icon name="check-circle" size={16} color="#10B981" solid />
+              <Text style={styles.statusCardLabel}>Status</Text>
+              <Text style={styles.statusCardValue}>Verified</Text>
             </View>
           </View>
         </View>
 
         <TouchableOpacity style={styles.quickActionButton}>
           <View style={styles.quickActionIcon}>
-            <Icon name="bolt" size={16} color="#FFFFFF" solid />
+            <Icon name="qrcode" size={16} color="#FFFFFF" solid />
           </View>
-          <Text style={styles.quickActionText}>Emergency Broadcast</Text>
+          <Text style={styles.quickActionText}>Accept Payment</Text>
           <Icon name="arrow-right" size={14} color="#CBD5E1" />
         </TouchableOpacity>
       </ScrollView>
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
   },
   header: {
-    backgroundColor: '#1E40AF',
+    backgroundColor: '#293454',
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 24,

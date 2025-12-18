@@ -37,7 +37,7 @@ export interface RegistrationData {
 export type AuthStackParamList = {
     Splash: undefined;
     Login: undefined;
-    SelectAgency: undefined;
+    Register: undefined;
     ForgotPassword: undefined;
     ResetPassword: { phoneNumber: string };
     Signup: undefined;
@@ -47,6 +47,12 @@ export type AuthStackParamList = {
     OTPVerification: { phoneNumber: string; registrationData?: RegistrationData };
     RegistrationComplete: { registrationData: RegistrationData };
     RegistrationStatus: undefined;
+    
+    // Merchant Dashboards (navigated from Splash after merchant type selection)
+    GeneralMerchantDashboard: undefined;
+    CorporateMerchantDashboard: undefined;
+    FuelMerchantDashboard: undefined;
+    GovernmentMerchantDashboard: undefined;
 };
 
 // ====================================
@@ -54,28 +60,79 @@ export type AuthStackParamList = {
 // ====================================
 export type MainStackParamList = {
     SelectAgency: undefined;
-    PolicePatrolDashboard: undefined;
-    FirePatrolDashboard: undefined;
-    AmbulancePatrolDashboard: undefined;
-    ImmigrationDashboard: undefined;
-    MapScreen: undefined;
-    ResponseScreen: { incidentId?: string };
-    TrafficScreen: undefined;
-    IssueTicketScreen: { vehicleData?: any };
-    ReportsScreen: undefined;
-    NewReport: undefined;
-    TeamCommsScreen: undefined;
-    ImmigrationScannerScreen: undefined;
-    DatabaseSearchScreen: { query?: string };
-    AdminMenuScreen: undefined;
+    
+    // Merchant Dashboards
+    GeneralMerchantDashboard: undefined;
+    CorporateMerchantDashboard: undefined;
+    FuelMerchantDashboard: undefined;
+    GovernmentMerchantDashboard: undefined;
+    
+    // Profile & Settings
     ProfileScreen: undefined;
     NotificationsScreen: undefined;
-    DispatchDetails: { alert?: any };
+    EditProfile: undefined;
+    
+    // Success Screen
     SuccessScreen: {
         title?: string;
         message?: string;
         transactionId?: string;
     };
+    
+    // ====================================
+    // MERCHANT SCREENS
+    // ====================================
+    // Fuel Merchant
+    FuelRedemption: undefined;
+    
+    // General Merchant
+    ReceivePayment: { amount?: number; currency?: string };
+    WithdrawFunds: undefined;
+    
+    // Corporate Merchant
+    StandingOrder: undefined;
+    
+    // Shared Merchant Screens
+    ActionSuccess: {
+        title?: string;
+        message?: string;
+        actionLabel?: string;
+        amount?: number;
+        currency?: string;
+        transactionId?: string;
+    };
+    TransactionDetails: {
+        transactionId?: string;
+        amount?: number;
+        currency?: string;
+        status?: 'success' | 'pending' | 'failed';
+        senderName?: string;
+        senderAvatar?: string;
+        paymentMethod?: 'visa' | 'mastercard' | 'stripe' | 'bank';
+        cardLast4?: string;
+        note?: string;
+        date?: string;
+        time?: string;
+    };
+    BankDetails: undefined;
+    RegisterSubMerchant: undefined;
+    HelpCenter: undefined;
+    MerchantSupport: { merchantType?: 'general' | 'fuel' | 'corporate' };
+    MerchantReports: { merchantType?: 'general' | 'fuel' | 'corporate'; merchantName?: string };
+    InitiateRefund: {
+        transactionId?: string;
+        customerName?: string;
+        customerInitials?: string;
+        originalAmount?: number;
+        currency?: string;
+        date?: string;
+        time?: string;
+    };
+    VerificationDetails: undefined;
+    Settlement: { merchantType?: 'general' | 'fuel' | 'corporate' };
+    ServiceManagement: undefined;
+    SubscriptionRequests: undefined;
+    MyStore: undefined;
 };
 
 // ====================================

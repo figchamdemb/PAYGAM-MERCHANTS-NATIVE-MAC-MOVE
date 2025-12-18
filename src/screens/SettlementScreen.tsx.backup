@@ -1,0 +1,1099 @@
+﻿/**
+ * PAYGAM MERCHANT - SETTLEMENT SCREEN
+ * Settlement/withdrawal screen for all merchant types
+ * Features: Bank Transfer, Wallet Transfer, Cashout
+ * Includes: Bank Selection Modal, Wallet Selection Modal, Success Modal
+ */
+
+import React, { useState, useRef } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  Platform,
+  StatusBar,
+  SafeAreaView,
+  ScrollView,
+  TextInput,
+  Animated,
+  Modal,
+  KeyboardAvoidingView,
+} from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import Svg, { Path, Circle, Rect, G } from 'react-native-svg';
+
+const { width, height } = Dimensions.get('window');
+
+// ==================== SVG ICONS ====================
+const ArrowLeftIcon: React.FC<{ size?: number; color?: string }> = ({ size = 20, color = '#FFFFFF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M19 12H5M12 19l-7-7 7-7" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const BellIcon: React.FC<{ size?: number; color?: string }> = ({ size = 20, color = '#FFFFFF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const WalletIcon: React.FC<{ size?: number; color?: string }> = ({ size = 20, color = '#293454' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+  </Svg>
+);
+
+const BankIcon: React.FC<{ size?: number; color?: string }> = ({ size = 20, color = '#293454' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z" />
+  </Svg>
+);
+
+const CashoutIcon: React.FC<{ size?: number; color?: string }> = ({ size = 20, color = '#293454' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M6.5 10h-2v7h2v-7zm6 0h-2v7h2v-7zm8.5 9H2v2h19v-2zm-2.5-9h-2v7h2v-7zm-7-6.74L16.71 6H6.29l5.21-2.74m0-2.26L2 6v2h19V6l-9.5-5z" />
+  </Svg>
+);
+
+const BuildingIcon: React.FC<{ size?: number; color?: string }> = ({ size = 18, color = '#059669' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z" />
+  </Svg>
+);
+
+const ChevronDownIcon: React.FC<{ size?: number; color?: string }> = ({ size = 12, color = '#9CA3AF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M6 9l6 6 6-6" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const SendIcon: React.FC<{ size?: number; color?: string }> = ({ size = 14, color = '#FFFFFF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+  </Svg>
+);
+
+const ClockIcon: React.FC<{ size?: number; color?: string }> = ({ size = 18, color = '#F59E0B' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+  </Svg>
+);
+
+const HomeIcon: React.FC<{ size?: number; color?: string }> = ({ size = 22, color = '#9CA3AF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+  </Svg>
+);
+
+const ListIcon: React.FC<{ size?: number; color?: string }> = ({ size = 22, color = '#9CA3AF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
+  </Svg>
+);
+
+const TransferIcon: React.FC<{ size?: number; color?: string }> = ({ size = 24, color = '#FFFFFF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z" />
+  </Svg>
+);
+
+const ChartIcon: React.FC<{ size?: number; color?: string }> = ({ size = 22, color = '#293454' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z" />
+  </Svg>
+);
+
+const UserIcon: React.FC<{ size?: number; color?: string }> = ({ size = 22, color = '#9CA3AF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+  </Svg>
+);
+
+// ==================== TYPES ====================
+type SettlementType = 'wallet' | 'bank' | 'cashout';
+type MerchantType = 'general' | 'fuel' | 'corporate';
+type FilterType = 'all' | 'pending' | 'done';
+
+interface HistoryItem {
+  id: string;
+  type: 'bank' | 'wallet' | 'cashout';
+  title: string;
+  subtitle: string;
+  amount: string;
+  status: 'pending' | 'accepted' | 'transferred';
+  date: string;
+}
+
+interface RouteParams {
+  merchantType?: MerchantType;
+}
+
+// ==================== MAIN COMPONENT ====================
+const SettlementScreen: React.FC = () => {
+  const navigation = useNavigation<any>();
+  const route = useRoute();
+  const params = route.params as RouteParams | undefined;
+  
+  // Get merchant type from route params (default to general)
+  const merchantType: MerchantType = params?.merchantType || 'general';
+  
+  const [selectedCurrency, setSelectedCurrency] = useState<string>('GMD');
+  const [selectedType, setSelectedType] = useState<SettlementType>('bank');
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
+  const [amount, setAmount] = useState<string>('');
+  
+  const buttonScale = useRef(new Animated.Value(1)).current;
+
+  const currencies = ['GMD', 'USD', 'GBP', 'EUR'];
+  
+  // Balance per currency (demo data)
+  const balances: Record<string, string> = {
+    GMD: '142,500.00',
+    USD: '2,850.00',
+    GBP: '2,125.00',
+    EUR: '2,450.00',
+  };
+
+  // History items (demo data)
+  const historyItems: HistoryItem[] = [
+    {
+      id: 'REQ-9928',
+      type: 'bank',
+      title: 'Bank Withdrawal',
+      subtitle: 'ID: #REQ-9928  Today',
+      amount: '- 50,000.00',
+      status: 'pending',
+      date: 'Today',
+    },
+    {
+      id: 'REQ-9925',
+      type: 'wallet',
+      title: 'Wallet Transfer',
+      subtitle: 'To: +220 777 1234  Yesterday',
+      amount: '- 2,500.00',
+      status: 'accepted',
+      date: 'Yesterday',
+    },
+    {
+      id: 'REQ-9920',
+      type: 'bank',
+      title: 'Bank Withdrawal',
+      subtitle: 'Ecobank  Oct 24',
+      amount: '- 120,000.00',
+      status: 'transferred',
+      date: 'Oct 24',
+    },
+  ];
+
+  // Filter history based on selected filter
+  const filteredHistory = historyItems.filter((item) => {
+    if (selectedFilter === 'all') return true;
+    if (selectedFilter === 'pending') return item.status === 'pending';
+    if (selectedFilter === 'done') return item.status === 'accepted' || item.status === 'transferred';
+    return true;
+  });
+
+  // Check if settlement type is available for merchant type
+  const isTypeAvailable = (type: SettlementType): boolean => {
+    if (merchantType === 'general') return true;
+    if (merchantType === 'fuel' || merchantType === 'corporate') {
+      return type === 'bank';
+    }
+    return true;
+  };
+
+  const handlePressIn = () => {
+    Animated.spring(buttonScale, {
+      toValue: 0.98,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(buttonScale, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleSendRequest = () => {
+    // Determine which dashboard to navigate back to
+    let targetDashboard = 'GeneralMerchantDashboard';
+    if (merchantType === 'corporate') {
+      targetDashboard = 'CorporateMerchantDashboard';
+    } else if (merchantType === 'fuel') {
+      targetDashboard = 'FuelMerchantDashboard';
+    }
+    
+    // Navigate to success or process settlement
+    navigation.navigate('ActionSuccess', {
+      type: 'withdrawal',
+      title: 'Settlement Requested',
+      message: 'Your settlement request has been submitted successfully.',
+      amount: parseFloat(amount.replace(/,/g, '')) || 0,
+      currency: selectedCurrency,
+      navigateTo: targetDashboard,
+    });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return { bg: '#FEF3C7', text: '#B45309' };
+      case 'accepted':
+      case 'transferred':
+        return { bg: '#D1FAE5', text: '#047857' };
+      default:
+        return { bg: '#F3F4F6', text: '#6B7280' };
+    }
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'bank':
+        return <BankIcon size={18} color="#059669" />;
+      case 'wallet':
+        return <WalletIcon size={18} color="#293454" />;
+      case 'cashout':
+        return <CashoutIcon size={18} color="#293454" />;
+      default:
+        return <ClockIcon size={18} color="#F59E0B" />;
+    }
+  };
+
+  const getTypeIconBg = (type: string, status: string) => {
+    if (status === 'pending') return '#FEF3C7';
+    switch (type) {
+      case 'bank':
+        return '#D1FAE5';
+      case 'wallet':
+        return '#DBEAFE';
+      default:
+        return '#F3F4F6';
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#293454" />
+      
+      {/* Header Section */}
+      <View style={styles.header}>
+        {/* Top Navigation */}
+        <SafeAreaView>
+          <View style={styles.topNav}>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
+            >
+              <ArrowLeftIcon size={20} color="#FFFFFF" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Settlements</Text>
+            <TouchableOpacity style={styles.navButton} activeOpacity={0.7}>
+              <BellIcon size={20} color="#FFFFFF" />
+              <View style={styles.notificationDot} />
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+
+        {/* Balance Section */}
+        <View style={styles.balanceSection}>
+          <Text style={styles.balanceLabel}>Available Balance</Text>
+          <View style={styles.balanceRow}>
+            <Text style={styles.currencyCode}>{selectedCurrency}</Text>
+            <Text style={styles.balanceAmount}>
+              {balances[selectedCurrency].split('.')[0]}
+              <Text style={styles.balanceDecimal}>.{balances[selectedCurrency].split('.')[1]}</Text>
+            </Text>
+          </View>
+
+          {/* Currency Tabs */}
+          <View style={styles.currencyTabs}>
+            {currencies.map((currency) => (
+              <TouchableOpacity
+                key={currency}
+                style={[
+                  styles.currencyTab,
+                  selectedCurrency === currency && styles.currencyTabActive,
+                ]}
+                onPress={() => setSelectedCurrency(currency)}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={[
+                    styles.currencyTabText,
+                    selectedCurrency === currency && styles.currencyTabTextActive,
+                  ]}
+                >
+                  {currency}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </View>
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Quick Actions */}
+        <View style={styles.quickActionsContainer}>
+          <View style={styles.quickActions}>
+            {/* Wallet Option */}
+            <TouchableOpacity
+              style={[
+                styles.actionButton,
+                selectedType === 'wallet' && isTypeAvailable('wallet') && styles.actionButtonActive,
+                !isTypeAvailable('wallet') && styles.actionButtonDisabled,
+              ]}
+              onPress={() => isTypeAvailable('wallet') && setSelectedType('wallet')}
+              activeOpacity={isTypeAvailable('wallet') ? 0.7 : 1}
+              disabled={!isTypeAvailable('wallet')}
+            >
+              <View
+                style={[
+                  styles.actionIconContainer,
+                  selectedType === 'wallet' && isTypeAvailable('wallet') && styles.actionIconActive,
+                  !isTypeAvailable('wallet') && styles.actionIconDisabled,
+                ]}
+              >
+                <WalletIcon
+                  size={20}
+                  color={selectedType === 'wallet' && isTypeAvailable('wallet') ? '#FFFFFF' : '#293454'}
+                />
+              </View>
+              <Text style={[
+                styles.actionLabel,
+                selectedType === 'wallet' && isTypeAvailable('wallet') && styles.actionLabelActive,
+                !isTypeAvailable('wallet') && styles.actionLabelDisabled,
+              ]}>
+                To Wallet
+              </Text>
+              <Text style={[
+                styles.actionSubLabel,
+                !isTypeAvailable('wallet') && styles.actionSubLabelDisabled,
+              ]}>
+                (General)
+              </Text>
+            </TouchableOpacity>
+
+            {/* Bank Option */}
+            <TouchableOpacity
+              style={[
+                styles.actionButton,
+                selectedType === 'bank' && styles.actionButtonActive,
+              ]}
+              onPress={() => setSelectedType('bank')}
+              activeOpacity={0.7}
+            >
+              <View
+                style={[
+                  styles.actionIconContainer,
+                  selectedType === 'bank' && styles.actionIconActive,
+                ]}
+              >
+                <BankIcon size={20} color={selectedType === 'bank' ? '#FFFFFF' : '#293454'} />
+              </View>
+              <Text style={[styles.actionLabel, selectedType === 'bank' && styles.actionLabelActive]}>
+                To Bank
+              </Text>
+              <Text style={styles.actionSubLabel}>(Corporate)</Text>
+            </TouchableOpacity>
+
+            {/* Cashout Option */}
+            <TouchableOpacity
+              style={[
+                styles.actionButton,
+                selectedType === 'cashout' && isTypeAvailable('cashout') && styles.actionButtonActive,
+                !isTypeAvailable('cashout') && styles.actionButtonDisabled,
+              ]}
+              onPress={() => isTypeAvailable('cashout') && setSelectedType('cashout')}
+              activeOpacity={isTypeAvailable('cashout') ? 0.7 : 1}
+              disabled={!isTypeAvailable('cashout')}
+            >
+              <View
+                style={[
+                  styles.actionIconContainer,
+                  selectedType === 'cashout' && isTypeAvailable('cashout') && styles.actionIconActive,
+                  !isTypeAvailable('cashout') && styles.actionIconDisabled,
+                ]}
+              >
+                <CashoutIcon
+                  size={20}
+                  color={selectedType === 'cashout' && isTypeAvailable('cashout') ? '#FFFFFF' : '#293454'}
+                />
+              </View>
+              <Text style={[
+                styles.actionLabel,
+                selectedType === 'cashout' && isTypeAvailable('cashout') && styles.actionLabelActive,
+                !isTypeAvailable('cashout') && styles.actionLabelDisabled,
+              ]}>
+                Cashout
+              </Text>
+              <Text style={[
+                styles.actionSubLabel,
+                !isTypeAvailable('cashout') && styles.actionSubLabelDisabled,
+              ]}>
+                (Agent)
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Withdrawal Form */}
+        <View style={styles.formSection}>
+          <Text style={styles.sectionTitle}>New Request</Text>
+          
+          <View style={styles.formCard}>
+            {/* Destination Selection */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>DESTINATION ACCOUNT</Text>
+              <TouchableOpacity style={styles.destinationSelector} activeOpacity={0.7}>
+                <View style={styles.destinationLeft}>
+                  <View style={styles.destinationIcon}>
+                    <BuildingIcon size={18} color="#059669" />
+                  </View>
+                  <View>
+                    <Text style={styles.destinationName}>GTBank Gambia</Text>
+                    <Text style={styles.destinationAccount}>Acct:  4582</Text>
+                  </View>
+                </View>
+                <ChevronDownIcon size={14} color="#9CA3AF" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Amount Input */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>WITHDRAWAL AMOUNT</Text>
+              <View style={styles.amountInputContainer}>
+                <Text style={styles.amountCurrency}>{selectedCurrency}</Text>
+                <TextInput
+                  style={styles.amountInput}
+                  placeholder="0.00"
+                  placeholderTextColor="#D1D5DB"
+                  keyboardType="numeric"
+                  value={amount}
+                  onChangeText={setAmount}
+                />
+              </View>
+              <View style={styles.amountMeta}>
+                <Text style={styles.feeText}>Fee: {selectedCurrency} 25.00</Text>
+                <TouchableOpacity
+                  onPress={() => setAmount(balances[selectedCurrency].replace(/,/g, ''))}
+                >
+                  <Text style={styles.maxText}>Max: {balances[selectedCurrency]}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Submit Button */}
+            <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={handleSendRequest}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+                activeOpacity={0.9}
+              >
+                <Text style={styles.submitButtonText}>Send Request</Text>
+                <SendIcon size={14} color="#FFFFFF" />
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+        </View>
+
+        {/* History Section */}
+        <View style={styles.historySection}>
+          <View style={styles.historyHeader}>
+            <Text style={styles.sectionTitle}>Recent History</Text>
+            <View style={styles.filterTabs}>
+              {(['all', 'pending', 'done'] as FilterType[]).map((filter) => (
+                <TouchableOpacity
+                  key={filter}
+                  style={[
+                    styles.filterTab,
+                    selectedFilter === filter && styles.filterTabActive,
+                  ]}
+                  onPress={() => setSelectedFilter(filter)}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={[
+                      styles.filterTabText,
+                      selectedFilter === filter && styles.filterTabTextActive,
+                    ]}
+                  >
+                    {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* History List */}
+          <View style={styles.historyList}>
+            {filteredHistory.map((item, index) => {
+              const statusColors = getStatusColor(item.status);
+              return (
+                <View
+                  key={item.id}
+                  style={[
+                    styles.historyItem,
+                    item.status !== 'pending' && styles.historyItemCompleted,
+                  ]}
+                >
+                  <View style={styles.historyItemLeft}>
+                    <View
+                      style={[
+                        styles.historyIcon,
+                        { backgroundColor: getTypeIconBg(item.type, item.status) },
+                      ]}
+                    >
+                      {item.status === 'pending' ? (
+                        <ClockIcon size={18} color="#F59E0B" />
+                      ) : (
+                        getTypeIcon(item.type)
+                      )}
+                    </View>
+                    <View>
+                      <Text style={styles.historyTitle}>{item.title}</Text>
+                      <Text style={styles.historySubtitle}>{item.subtitle}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.historyItemRight}>
+                    <Text
+                      style={[
+                        styles.historyAmount,
+                        item.status === 'pending' && styles.historyAmountPending,
+                      ]}
+                    >
+                      {item.amount}
+                    </Text>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        { backgroundColor: statusColors.bg },
+                      ]}
+                    >
+                      <Text style={[styles.statusText, { color: statusColors.text }]}>
+                        {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Bottom Navigation */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
+          <HomeIcon size={22} color="#9CA3AF" />
+          <Text style={styles.navItemText}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
+          <ListIcon size={22} color="#9CA3AF" />
+          <Text style={styles.navItemText}>Orders</Text>
+        </TouchableOpacity>
+        
+        {/* Center FAB */}
+        <View style={styles.fabContainer}>
+          <TouchableOpacity style={styles.fab} activeOpacity={0.8}>
+            <TransferIcon size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
+          <ChartIcon size={22} color="#293454" />
+          <Text style={[styles.navItemText, styles.navItemTextActive]}>Settle</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
+          <UserIcon size={22} color="#9CA3AF" />
+          <Text style={styles.navItemText}>Profile</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+// ==================== STYLES ====================
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+
+  // Header
+  header: {
+    backgroundColor: '#293454',
+    paddingBottom: 40,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
+    zIndex: 10,
+  },
+  topNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight || 12 : 12,
+    paddingBottom: 32,
+  },
+  navButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
+  notificationDot: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#EF4444',
+    borderWidth: 2,
+    borderColor: '#293454',
+  },
+
+  // Balance
+  balanceSection: {
+    alignItems: 'center',
+  },
+  balanceLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#93C5FD',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 8,
+  },
+  balanceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 8,
+    marginBottom: 24,
+  },
+  currencyCode: {
+    fontSize: 24,
+    fontWeight: '500',
+    color: '#93C5FD',
+  },
+  balanceAmount: {
+    fontSize: 48,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: -1,
+  },
+  balanceDecimal: {
+    fontSize: 24,
+    fontWeight: '500',
+    color: '#93C5FD',
+  },
+
+  // Currency Tabs
+  currencyTabs: {
+    flexDirection: 'row',
+    backgroundColor: '#1E263E',
+    padding: 4,
+    borderRadius: 100,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  currencyTab: {
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 100,
+  },
+  currencyTabActive: {
+    backgroundColor: '#FFFFFF',
+  },
+  currencyTabText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#9CA3AF',
+  },
+  currencyTabTextActive: {
+    fontWeight: '700',
+    color: '#293454',
+  },
+
+  // Scroll
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 120,
+  },
+
+  // Quick Actions
+  quickActionsContainer: {
+    paddingHorizontal: 24,
+    marginTop: -32,
+    zIndex: 20,
+  },
+  quickActions: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 8,
+    flexDirection: 'row',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  actionButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  actionButtonActive: {
+    backgroundColor: 'rgba(219, 234, 254, 0.5)',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  actionButtonDisabled: {
+    opacity: 0.4,
+  },
+  actionIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#EFF6FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  actionIconActive: {
+    backgroundColor: '#293454',
+    shadowColor: '#1E3A8A',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  actionIconDisabled: {
+    backgroundColor: '#F3F4F6',
+  },
+  actionLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#4B5563',
+    textAlign: 'center',
+  },
+  actionLabelActive: {
+    fontWeight: '700',
+    color: '#293454',
+  },
+  actionLabelDisabled: {
+    color: '#9CA3AF',
+  },
+  actionSubLabel: {
+    fontSize: 9,
+    color: '#9CA3AF',
+    marginTop: 2,
+  },
+  actionSubLabelDisabled: {
+    color: '#D1D5DB',
+  },
+
+  // Form Section
+  formSection: {
+    paddingHorizontal: 24,
+    marginTop: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#293454',
+    marginBottom: 12,
+  },
+  formCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#6B7280',
+    textTransform: 'uppercase',
+    marginBottom: 8,
+  },
+  destinationSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  destinationLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  destinationIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#D1FAE5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  destinationName: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+  destinationAccount: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  amountInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+  },
+  amountCurrency: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#9CA3AF',
+  },
+  amountInput: {
+    flex: 1,
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#293454',
+    paddingVertical: 16,
+    paddingLeft: 12,
+  },
+  amountMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    paddingHorizontal: 4,
+  },
+  feeText: {
+    fontSize: 10,
+    color: '#9CA3AF',
+  },
+  maxText: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#293454',
+  },
+  submitButton: {
+    backgroundColor: '#293454',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 16,
+    borderRadius: 12,
+    shadowColor: '#293454',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  submitButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+
+  // History Section
+  historySection: {
+    paddingHorizontal: 24,
+    marginTop: 32,
+  },
+  historyHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  filterTabs: {
+    flexDirection: 'row',
+    backgroundColor: '#E5E7EB',
+    padding: 4,
+    borderRadius: 8,
+  },
+  filterTab: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  filterTabActive: {
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  filterTabText: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#6B7280',
+  },
+  filterTabTextActive: {
+    fontWeight: '700',
+    color: '#293454',
+  },
+  historyList: {
+    gap: 12,
+  },
+  historyItem: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+  },
+  historyItemCompleted: {
+    opacity: 0.8,
+  },
+  historyItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  historyIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  historyTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+  historySubtitle: {
+    fontSize: 10,
+    color: '#9CA3AF',
+    marginTop: 2,
+  },
+  historyItemRight: {
+    alignItems: 'flex-end',
+  },
+  historyAmount: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#4B5563',
+  },
+  historyAmountPending: {
+    color: '#293454',
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 100,
+    marginTop: 4,
+  },
+  statusText: {
+    fontSize: 10,
+    fontWeight: '700',
+  },
+
+  // Bottom Navigation
+  bottomNav: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    paddingBottom: Platform.OS === 'ios' ? 28 : 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+    zIndex: 50,
+  },
+  navItem: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  navItemText: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#9CA3AF',
+  },
+  navItemTextActive: {
+    fontWeight: '700',
+    color: '#293454',
+  },
+  fabContainer: {
+    marginTop: -48,
+  },
+  fab: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#293454',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#293454',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 10,
+    borderWidth: 4,
+    borderColor: '#F9FAFB',
+  },
+});
+
+export default SettlementScreen;

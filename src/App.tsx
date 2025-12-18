@@ -1,15 +1,14 @@
 /**
- * ✅ LIVE RESPONSE - PATROL APP
+ * ✅ PAYGAM MERCHANT APP
  * Main Application Entry Point
  * 
- * Department Dashboards based on MFA Code:
- * - 123456 → Police Dashboard
- * - 111111 → Fire Dashboard
- * - 222222 → Immigration Dashboard
- * - 000006 → Ambulance Dashboard
+ * Merchant Types:
+ * - General Merchant (Retail, Shops)
+ * - Corporate Merchant (Businesses)
+ * - Fuel Merchant (Gas Stations)
  * 
- * Emergency Flow:
- * Dashboard → TaskDetails → EmergencyResponse → Complete
+ * Flow:
+ * Splash → Select Merchant Type → Merchant Dashboard
  */
 
 import React from 'react';
@@ -23,57 +22,54 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreenSimple from './screens/SplashScreenSimple';
 import LoginScreenSimple from './screens/LoginScreenSimple';
 
-// Department-specific dashboards
-import PoliceDashboardScreen from './screens/PoliceDashboardScreen';
-import FireDashboardScreen from './screens/FireDashboardScreen';
-import ImmigrationDashboardScreen from './screens/ImmigrationDashboardScreen';
-import AmbulanceDashboardScreen from './screens/AmbulanceDashboardScreen';
-import DashboardScreen from './screens/DashboardScreen'; // Fallback
+// Merchant Dashboards
+import GeneralMerchantDashboard from './screens/GeneralMerchantDashboard';
+import CorporateMerchantDashboard from './screens/CorporateMerchantDashboard';
+import FuelMerchantDashboard from './screens/FuelMerchantDashboard';
 
-// Emergency Task Details Screens
-import PoliceTaskDetailsScreen from './screens/emergency/PoliceTaskDetailsScreen';
-import FireTaskDetailsScreen from './screens/emergency/FireTaskDetailsScreen';
-import AmbulanceTaskDetailsScreen from './screens/emergency/AmbulanceTaskDetailsScreen';
-import ImmigrationTaskDetailsScreen from './screens/emergency/ImmigrationTaskDetailsScreen';
+// Merchant Feature Screens
+import ReceivePaymentScreen from './screens/ReceivePaymentScreen';
+import WithdrawFundsScreen from './screens/WithdrawFundsScreen';
+import FuelRedemptionScreen from './screens/FuelRedemptionScreen';
+import TransactionDetailsScreen from './screens/TransactionDetailsScreen';
+import ActionSuccessScreen from './screens/ActionSuccessScreen';
+import BankDetailsScreen from './screens/BankDetailsScreen';
+import RegisterSubMerchantScreen from './screens/RegisterSubMerchantScreen';
+import HelpCenterScreen from './screens/HelpCenterScreen';
+import SettlementScreen from './screens/SettlementScreen';
+import ServiceManagementScreen from './screens/ServiceManagementScreen';
+import SubscriptionRequestsScreen from './screens/SubscriptionRequestsScreen';
+import MyStoreScreen from './screens/MyStoreScreen';
+import StandingOrderScreen from './screens/StandingOrderScreen';
+import CreateStandingOrderScreen from './screens/CreateStandingOrderScreen';
+import CurrencyConverterScreen from './screens/CurrencyConverterScreen';
+import TopUpWalletScreen from './screens/TopUpWalletScreen';
+import UpdateFuelPricesScreen from './screens/UpdateFuelPricesScreen';
+import TransactionHistoryScreen from './screens/TransactionHistoryScreen';
+import CreateInvoiceScreen from './screens/CreateInvoiceScreen';
+import CreatePaymentScreen from './screens/CreatePaymentScreen';
+import EditProfileScreen from './screens/EditProfileScreen';
+import GeneralRegistrationScreen from './screens/GeneralRegistrationScreen';
+import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
+import OTPVerificationScreen from './screens/OTPVerificationScreen';
+import ResetPasswordScreen from './screens/ResetPasswordScreen';
 
-// Emergency Response Screens (En-Route/Navigation)
-import PoliceEmergencyResponseScreen from './screens/emergency/PoliceEmergencyResponseScreen';
-import FireEmergencyResponseScreen from './screens/emergency/FireEmergencyResponseScreen';
-import AmbulanceEmergencyResponseScreen from './screens/emergency/AmbulanceEmergencyResponseScreen';
-import ImmigrationEmergencyResponseScreen from './screens/emergency/ImmigrationEmergencyResponseScreen';
-
-// Police-Specific Feature Screens
-import TrafficOpsANPRScreen from './screens/police/TrafficOpsANPRScreen';
-import IncidentReportingScreen from './screens/police/IncidentReportingScreen';
-import TeamGridRadioScreen from './screens/police/TeamGridRadioScreen';
-import GlobalDatabaseSearchScreen from './screens/police/GlobalDatabaseSearchScreen';
-import DispatcherMapScreen from './screens/police/DispatcherMapScreen';
-import WriteForCitizenScreen from './screens/police/WriteForCitizenScreen';
-import StatementFormScreen from './screens/police/StatementFormScreen';
-import TrafficTicketScreen from './screens/police/TrafficTicketScreen';
-import VehicleSearchScreen from './screens/police/VehicleSearchScreen';
-import SearchCasesScreen from './screens/police/SearchCasesScreen';
-
-// Fire-Specific Feature Screens
-import FireDispatcherScreen from './screens/fire/FireDispatcherScreen';
-import FireIncidentReportScreen from './screens/fire/FireIncidentReportScreen';
-import FireTeamRadioScreen from './screens/fire/FireTeamRadioScreen';
-
-// Ambulance-Specific Feature Screens
-import AmbulanceDispatcherScreen from './screens/ambulance/AmbulanceDispatcherScreen';
-import AmbulancePatientReportScreen from './screens/ambulance/AmbulancePatientReportScreen';
-import AmbulanceTeamRadioScreen from './screens/ambulance/AmbulanceTeamRadioScreen';
-
-// Immigration-Specific Feature Screens
-import ImmigrationDispatcherScreen from './screens/immigration/ImmigrationDispatcherScreen';
-import ImmigrationCaseReportScreen from './screens/immigration/ImmigrationCaseReportScreen';
-import ImmigrationTeamRadioScreen from './screens/immigration/ImmigrationTeamRadioScreen';
-import PermitVisaLookupScreen from './screens/immigration/PermitVisaLookupScreen';
-
-// Shared Screens (all departments)
-import OfficerProfileScreen from './screens/OfficerProfileScreen';
+// Shared Screens
+import ProfileScreen from './features/profile/screens/ProfileScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import SettingsProfileScreen from './screens/SettingsProfileScreen';
+import VerificationDetailsScreen from './screens/VerificationDetailsScreen';
+import NotificationsScreen from './screens/NotificationsScreen';
 import QRScannerScreen from './screens/QRScannerScreen';
+import MerchantReportsScreen from './screens/MerchantReportsScreen';
+import InitiateRefundScreen from './screens/InitiateRefundScreen';
+import MerchantSupportScreen from './screens/MerchantSupportScreen';
+
+// Merchant Type Selection
+import SelectAgencyScreen from './features/auth/screens/SelectAgencyScreen';
+
+// Placeholder screens for navigation targets that don't have dedicated screens yet
+import PlaceholderScreen from './screens/PlaceholderScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -94,62 +90,67 @@ const App: React.FC = () => {
             {/* Auth Flow */}
             <Stack.Screen name="Splash" component={SplashScreenSimple} />
             <Stack.Screen name="Login" component={LoginScreenSimple} />
+            <Stack.Screen name="SignUp" component={GeneralRegistrationScreen} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+            <Stack.Screen name="OTPVerification" component={OTPVerificationScreen} />
+            <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+            <Stack.Screen name="SelectAgency" component={SelectAgencyScreen} />
             
-            {/* Department Dashboards */}
-            <Stack.Screen name="PoliceDashboard" component={PoliceDashboardScreen} />
-            <Stack.Screen name="FireDashboard" component={FireDashboardScreen} />
-            <Stack.Screen name="ImmigrationDashboard" component={ImmigrationDashboardScreen} />
-            <Stack.Screen name="AmbulanceDashboard" component={AmbulanceDashboardScreen} />
-            <Stack.Screen name="Dashboard" component={DashboardScreen} />
+            {/* Merchant Dashboards */}
+            <Stack.Screen name="GeneralMerchantDashboard" component={GeneralMerchantDashboard} />
+            <Stack.Screen name="CorporateMerchantDashboard" component={CorporateMerchantDashboard} />
+            <Stack.Screen name="FuelMerchantDashboard" component={FuelMerchantDashboard} />
+            <Stack.Screen name="GovernmentMerchantDashboard" component={CorporateMerchantDashboard} />
             
-            {/* Police Emergency Flow */}
-            <Stack.Screen name="PoliceTaskDetails" component={PoliceTaskDetailsScreen} />
-            <Stack.Screen name="PoliceEmergencyResponse" component={PoliceEmergencyResponseScreen} />
-            
-            {/* Fire Emergency Flow */}
-            <Stack.Screen name="FireTaskDetails" component={FireTaskDetailsScreen} />
-            <Stack.Screen name="FireEmergencyResponse" component={FireEmergencyResponseScreen} />
-            
-            {/* Ambulance Emergency Flow */}
-            <Stack.Screen name="AmbulanceTaskDetails" component={AmbulanceTaskDetailsScreen} />
-            <Stack.Screen name="AmbulanceEmergencyResponse" component={AmbulanceEmergencyResponseScreen} />
-            
-            {/* Immigration Emergency Flow */}
-            <Stack.Screen name="ImmigrationTaskDetails" component={ImmigrationTaskDetailsScreen} />
-            <Stack.Screen name="ImmigrationEmergencyResponse" component={ImmigrationEmergencyResponseScreen} />
-            
-            {/* Police Feature Screens */}
-            <Stack.Screen name="TrafficOpsANPR" component={TrafficOpsANPRScreen} />
-            <Stack.Screen name="IncidentReporting" component={IncidentReportingScreen} />
-            <Stack.Screen name="TeamGridRadio" component={TeamGridRadioScreen} />
-            <Stack.Screen name="GlobalDatabaseSearch" component={GlobalDatabaseSearchScreen} />
-            <Stack.Screen name="DispatcherMap" component={DispatcherMapScreen} />
-            <Stack.Screen name="WriteForCitizen" component={WriteForCitizenScreen} />
-            <Stack.Screen name="StatementForm" component={StatementFormScreen} />
-            <Stack.Screen name="TrafficTicket" component={TrafficTicketScreen} />
-            <Stack.Screen name="VehicleSearch" component={VehicleSearchScreen} />
-            <Stack.Screen name="SearchCases" component={SearchCasesScreen} />
-            
-            {/* Fire Feature Screens */}
-            <Stack.Screen name="FireDispatcher" component={FireDispatcherScreen} />
-            <Stack.Screen name="FireIncidentReport" component={FireIncidentReportScreen} />
-            <Stack.Screen name="FireTeamRadio" component={FireTeamRadioScreen} />
-            
-            {/* Ambulance Feature Screens */}
-            <Stack.Screen name="AmbulanceDispatcher" component={AmbulanceDispatcherScreen} />
-            <Stack.Screen name="AmbulancePatientReport" component={AmbulancePatientReportScreen} />
-            <Stack.Screen name="AmbulanceTeamRadio" component={AmbulanceTeamRadioScreen} />
-            
-            {/* Immigration Feature Screens */}
-            <Stack.Screen name="ImmigrationDispatcher" component={ImmigrationDispatcherScreen} />
-            <Stack.Screen name="ImmigrationCaseReport" component={ImmigrationCaseReportScreen} />
-            <Stack.Screen name="ImmigrationTeamRadio" component={ImmigrationTeamRadioScreen} />
-            <Stack.Screen name="PermitVisaLookup" component={PermitVisaLookupScreen} />
+            {/* Merchant Feature Screens */}
+            <Stack.Screen name="ReceivePayment" component={ReceivePaymentScreen} />
+            <Stack.Screen name="WithdrawFunds" component={WithdrawFundsScreen} />
+            <Stack.Screen name="FuelRedemption" component={FuelRedemptionScreen} />
+            <Stack.Screen name="TransactionDetails" component={TransactionDetailsScreen} />
+            <Stack.Screen name="ActionSuccess" component={ActionSuccessScreen} />
+            <Stack.Screen name="BankDetails" component={BankDetailsScreen} />
+            <Stack.Screen name="RegisterSubMerchant" component={RegisterSubMerchantScreen} />
+            <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
+            <Stack.Screen name="Settlement" component={SettlementScreen} />
+            <Stack.Screen name="ServiceManagement" component={ServiceManagementScreen} />
+            <Stack.Screen name="SubscriptionRequests" component={SubscriptionRequestsScreen} />
+            <Stack.Screen name="MyStore" component={MyStoreScreen} />
+            <Stack.Screen name="StandingOrder" component={StandingOrderScreen} />
+            <Stack.Screen name="CreateStandingOrder" component={CreateStandingOrderScreen} />
             
             {/* Shared Screens */}
-            <Stack.Screen name="OfficerProfile" component={OfficerProfileScreen} />
+            <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
+            <Stack.Screen name="SettingsProfile" component={SettingsProfileScreen} />
+            <Stack.Screen name="VerificationDetails" component={VerificationDetailsScreen} />
+            <Stack.Screen name="SettingsLanguage" component={PlaceholderScreen} />
+            <Stack.Screen name="NotificationsScreen" component={NotificationsScreen} />
             <Stack.Screen name="QRScanner" component={QRScannerScreen} />
+            <Stack.Screen name="MerchantReports" component={MerchantReportsScreen} />
+            <Stack.Screen name="InitiateRefund" component={InitiateRefundScreen} />
+            <Stack.Screen name="MerchantSupport" component={MerchantSupportScreen} />
+            
+            {/* Sidebar Menu Screens - Map navigation targets */}
+            <Stack.Screen name="QRCodeScreen" component={ReceivePaymentScreen} />
+            <Stack.Screen name="MyStoreScreen" component={MyStoreScreen} />
+            <Stack.Screen name="ServiceListScreen" component={ServiceManagementScreen} />
+            <Stack.Screen name="CreateServiceScreen" component={ServiceManagementScreen} />
+            <Stack.Screen name="SubscribersScreen" component={SubscriptionRequestsScreen} />
+            <Stack.Screen name="RegisterShopMerchant" component={RegisterSubMerchantScreen} />
+            <Stack.Screen name="BankAccountScreen" component={BankDetailsScreen} />
+            
+            {/* Placeholder screens for features not yet implemented */}
+            <Stack.Screen name="KYCScreen" component={VerificationDetailsScreen} />
+            <Stack.Screen name="CurrencyConverter" component={CurrencyConverterScreen} />
+            <Stack.Screen name="TopUpWallet" component={TopUpWalletScreen} />
+            <Stack.Screen name="UpdateFuelPrices" component={UpdateFuelPricesScreen} />
+            <Stack.Screen name="TransactionHistory" component={TransactionHistoryScreen} />
+            <Stack.Screen name="CreateInvoice" component={CreateInvoiceScreen} />
+            <Stack.Screen name="CreatePayment" component={CreatePaymentScreen} />
+            <Stack.Screen name="CouponScreen" component={PlaceholderScreen} />
+            <Stack.Screen name="ChangePIN" component={PlaceholderScreen} />
+            <Stack.Screen name="ChangeMPIN" component={PlaceholderScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaProvider>

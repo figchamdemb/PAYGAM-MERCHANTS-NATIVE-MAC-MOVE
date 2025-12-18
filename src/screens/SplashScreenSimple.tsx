@@ -1,368 +1,665 @@
 /**
- * ✅ LIVE RESPONSE - SPLASH SCREEN (SIMPLE VERSION)
- * Blue gradient splash screen without FontAwesome dependency
+ * PAYGAM MERCHANT - SPLASH SCREEN
+ * Auto-sliding splash with merchant type selection
+ * Merchant Types: General, Corporate, Fuel
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
-    View,
-    Text,
-    StyleSheet,
-    Animated,
-    Dimensions,
-    StatusBar,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+  StatusBar,
+  Animated,
+  ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import LinearGradient from 'react-native-linear-gradient';
-import Svg, { Path, Circle, Defs, RadialGradient, Stop, Rect, Pattern } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 
 const { width, height } = Dimensions.get('window');
 
-// Shield Icon as SVG Path (no FontAwesome dependency)
-const ShieldIcon: React.FC<{ size?: number; color?: string }> = ({ size = 60, color = '#FFFFFF' }) => (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <Path
-            d="M12 2L4 5V11C4 16.25 7.4 21.14 12 22C16.6 21.14 20 16.25 20 11V5L12 2Z"
-            fill={color}
-            opacity={0.2}
-        />
-        <Path
-            d="M12 2L4 5V11C4 16.25 7.4 21.14 12 22C16.6 21.14 20 16.25 20 11V5L12 2ZM12 20C8.5 19.22 6 14.94 6 11V6.4L12 4L18 6.4V11C18 14.94 15.5 19.22 12 20Z"
-            fill={color}
-        />
-        <Path
-            d="M12 7V13M12 13L9 10M12 13L15 10"
-            stroke={color}
-            strokeWidth={1.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
-    </Svg>
+// ==================== SVG ICONS ====================
+const BoltIcon: React.FC<{ size?: number; color?: string }> = ({ size = 24, color = '#FFFFFF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z" />
+  </Svg>
 );
 
-// Lock Icon as SVG Path
-const LockIcon: React.FC<{ size?: number; color?: string }> = ({ size = 10, color = '#FFFFFF' }) => (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
-        <Path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
-    </Svg>
+const ChartPieIcon: React.FC<{ size?: number; color?: string }> = ({ size = 40, color = '#93C5FD' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z" />
+  </Svg>
 );
 
+const ShieldIcon: React.FC<{ size?: number; color?: string }> = ({ size = 40, color = '#86EFAC' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
+  </Svg>
+);
+
+const StoreIcon: React.FC<{ size?: number; color?: string }> = ({ size = 24, color = '#293454' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z" />
+  </Svg>
+);
+
+const BuildingIcon: React.FC<{ size?: number; color?: string }> = ({ size = 24, color = '#DC2626' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z" />
+  </Svg>
+);
+
+const GasPumpIcon: React.FC<{ size?: number; color?: string }> = ({ size = 24, color = '#4F46E5' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M19.77 7.23l.01-.01-3.72-3.72L15 4.56l2.11 2.11c-.94.36-1.61 1.26-1.61 2.33 0 1.38 1.12 2.5 2.5 2.5.36 0 .69-.08 1-.21v7.21c0 .55-.45 1-1 1s-1-.45-1-1V14c0-1.1-.9-2-2-2h-1V5c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v16h10v-7.5h1.5v5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V9c0-.69-.28-1.32-.73-1.77zM12 10H6V5h6v5zm6 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" />
+  </Svg>
+);
+
+const CheckIcon: React.FC<{ size?: number; color?: string }> = ({ size = 12, color = '#FFFFFF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+  </Svg>
+);
+
+const ArrowRightIcon: React.FC<{ size?: number; color?: string }> = ({ size = 16, color = '#FFFFFF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z" />
+  </Svg>
+);
+
+// ==================== TYPES ====================
+interface MerchantType {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  iconBgColor: string;
+  route: string;
+}
+
+// ==================== MERCHANT TYPES DATA ====================
+const MERCHANT_TYPES: MerchantType[] = [
+  {
+    id: 'general',
+    name: 'General Merchant',
+    description: 'Retail Stores, Shops, Services',
+    icon: <StoreIcon size={24} color="#293454" />,
+    iconBgColor: '#DBEAFE',
+    route: 'GeneralMerchantDashboard',
+  },
+  {
+    id: 'corporate',
+    name: 'Corporate Merchant',
+    description: 'Business Payments, Companies',
+    icon: <BuildingIcon size={24} color="#DC2626" />,
+    iconBgColor: '#FEE2E2',
+    route: 'CorporateMerchantDashboard',
+  },
+  {
+    id: 'fuel',
+    name: 'Fuel Merchant',
+    description: 'Gas Stations, Fuel Services',
+    icon: <GasPumpIcon size={24} color="#4F46E5" />,
+    iconBgColor: '#E0E7FF',
+    route: 'FuelMerchantDashboard',
+  },
+];
+
+// ==================== MAIN COMPONENT ====================
 const SplashScreenSimple: React.FC = () => {
-    const navigation = useNavigation<any>();
+  const navigation = useNavigation<any>();
+  const [showSplash, setShowSplash] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [selectedMerchant, setSelectedMerchant] = useState<string>('general');
 
-    // Animation values
-    const pulseAnim = useRef(new Animated.Value(1)).current;
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const loadingAnim = useRef(new Animated.Value(0)).current;
+  // Animation values
+  const splashTranslateY = useRef(new Animated.Value(0)).current;
+  const mainContentOpacity = useRef(new Animated.Value(0)).current;
+  const loadingWidth = useRef(new Animated.Value(0)).current;
+  const slide1Opacity = useRef(new Animated.Value(1)).current;
+  const slide1TranslateX = useRef(new Animated.Value(0)).current;
+  const slide2Opacity = useRef(new Animated.Value(0)).current;
+  const slide2TranslateX = useRef(new Animated.Value(width)).current;
+  const logoOpacity = useRef(new Animated.Value(0)).current;
+  const logoTranslateY = useRef(new Animated.Value(-10)).current;
 
-    useEffect(() => {
-        // Fade in
-        Animated.timing(fadeAnim, {
-            toValue: 1,
-            duration: 800,
-            useNativeDriver: true,
-        }).start();
+  useEffect(() => {
+    // Fade in logo
+    Animated.timing(logoOpacity, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
 
-        // Pulse animation for logo
-        Animated.loop(
-            Animated.sequence([
-                Animated.timing(pulseAnim, {
-                    toValue: 1.1,
-                    duration: 1200,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(pulseAnim, {
-                    toValue: 1,
-                    duration: 1200,
-                    useNativeDriver: true,
-                }),
-            ])
-        ).start();
+    Animated.timing(logoTranslateY, {
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
 
-        // Loading bar animation
-        Animated.loop(
-            Animated.sequence([
-                Animated.timing(loadingAnim, {
-                    toValue: 1,
-                    duration: 1500,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(loadingAnim, {
-                    toValue: 0,
-                    duration: 0,
-                    useNativeDriver: true,
-                }),
-            ])
-        ).start();
+    // Loading bar animation (4.5 seconds)
+    Animated.timing(loadingWidth, {
+      toValue: 1,
+      duration: 4500,
+      useNativeDriver: false,
+    }).start();
 
-        // Navigate to Login after delay
-        const timer = setTimeout(() => {
-            navigation.replace('Login');
-        }, 5000);  // 5 seconds
+    // Slide transition at 2.2 seconds
+    const slideTimer = setTimeout(() => {
+      setCurrentSlide(1);
+      
+      // Animate slide 1 out
+      Animated.parallel([
+        Animated.timing(slide1Opacity, {
+          toValue: 0,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slide1TranslateX, {
+          toValue: -width,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+      ]).start();
 
-        return () => clearTimeout(timer);
-    }, [navigation]);
+      // Animate slide 2 in
+      Animated.parallel([
+        Animated.timing(slide2Opacity, {
+          toValue: 1,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slide2TranslateX, {
+          toValue: 0,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, 2200);
 
-    const loadingTranslate = loadingAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [-width * 0.6, width * 0.6],
-    });
+    // Transition to main content at 4.5 seconds
+    const mainTimer = setTimeout(() => {
+      // Slide splash up
+      Animated.timing(splashTranslateY, {
+        toValue: -height,
+        duration: 700,
+        useNativeDriver: true,
+      }).start();
 
-    return (
-        <View style={styles.container}>
-            <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
+      // Fade in main content
+      Animated.timing(mainContentOpacity, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }).start();
 
-            {/* Background Gradient */}
-            <LinearGradient
-                colors={['#1E40AF', '#172554', '#1E40AF']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-            />
+      setTimeout(() => {
+        setShowSplash(false);
+      }, 700);
+    }, 4500);
 
-            {/* Decorative Background Elements */}
-            <View style={[StyleSheet.absoluteFill, { overflow: 'hidden' }]}>
-                {/* Top-left glow */}
-                <Svg height={height} width={width} style={{ position: 'absolute', top: -100, left: -100 }}>
-                    <Defs>
-                        <RadialGradient id="blueGlow" cx="50%" cy="50%" rx="50%" ry="50%">
-                            <Stop offset="0" stopColor="#3B82F6" stopOpacity="0.3" />
-                            <Stop offset="1" stopColor="#3B82F6" stopOpacity="0" />
-                        </RadialGradient>
-                    </Defs>
-                    <Circle cx="150" cy="150" r="200" fill="url(#blueGlow)" />
-                </Svg>
+    return () => {
+      clearTimeout(slideTimer);
+      clearTimeout(mainTimer);
+    };
+  }, []);
 
-                {/* Bottom-right glow */}
-                <Svg height={height} width={width} style={{ position: 'absolute', bottom: -100, right: -100 }}>
-                    <Defs>
-                        <RadialGradient id="indigoGlow" cx="50%" cy="50%" rx="50%" ry="50%">
-                            <Stop offset="0" stopColor="#6366F1" stopOpacity="0.3" />
-                            <Stop offset="1" stopColor="#6366F1" stopOpacity="0" />
-                        </RadialGradient>
-                    </Defs>
-                    <Circle cx={width - 50} cy={height - 50} r="180" fill="url(#indigoGlow)" />
-                </Svg>
+  const handleContinue = () => {
+    const selected = MERCHANT_TYPES.find(m => m.id === selectedMerchant);
+    if (selected) {
+      // Navigate to Login with merchant type info
+      navigation.navigate('Login', { merchantType: selected.id, merchantRoute: selected.route });
+    }
+  };
 
-                {/* Grid Pattern */}
-                <Svg height="100%" width="100%" style={{ opacity: 0.1 }}>
-                    <Defs>
-                        <Pattern id="gridPattern" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
-                            <Circle cx="1" cy="1" r="1" fill="#FFFFFF" />
-                        </Pattern>
-                    </Defs>
-                    <Rect x="0" y="0" width="100%" height="100%" fill="url(#gridPattern)" />
-                </Svg>
+  const handleLogin = () => {
+    navigation.navigate('Login');
+  };
+
+  return (
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#293454" />
+
+      {/* MAIN CONTENT - Merchant Selection */}
+      <Animated.View style={[styles.mainContent, { opacity: mainContentOpacity }]}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.logoRow}>
+            <View style={styles.logoIcon}>
+              <BoltIcon size={20} color="#FFFFFF" />
+            </View>
+            <Text style={styles.logoText}>PayGam Merchant</Text>
+          </View>
+          <Text style={styles.headerTitle}>Select Merchant Type</Text>
+          <Text style={styles.headerSubtitle}>
+            Choose the category that best fits your business to customize your dashboard.
+          </Text>
+        </View>
+
+        {/* Scrollable Content */}
+        <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <View style={styles.optionsContainer}>
+            {MERCHANT_TYPES.map((merchant) => (
+              <TouchableOpacity
+                key={merchant.id}
+                style={[
+                  styles.optionCard,
+                  selectedMerchant === merchant.id && styles.optionCardSelected,
+                ]}
+                onPress={() => setSelectedMerchant(merchant.id)}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.optionIcon, { backgroundColor: merchant.iconBgColor }]}>
+                  {merchant.icon}
+                </View>
+                <View style={styles.optionInfo}>
+                  <Text style={styles.optionName}>{merchant.name}</Text>
+                  <Text style={styles.optionDesc}>{merchant.description}</Text>
+                </View>
+                <View style={[
+                  styles.radioOuter,
+                  selectedMerchant === merchant.id && styles.radioOuterSelected,
+                ]}>
+                  {selectedMerchant === merchant.id && (
+                    <CheckIcon size={12} color="#FFFFFF" />
+                  )}
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+
+        {/* Bottom Action */}
+        <View style={styles.bottomAction}>
+          <TouchableOpacity 
+            style={styles.continueButton}
+            onPress={handleContinue}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.continueButtonText}>Continue</Text>
+            <ArrowRightIcon size={16} color="#FFFFFF" />
+          </TouchableOpacity>
+          <View style={styles.loginPrompt}>
+            <Text style={styles.loginText}>Already have an account? </Text>
+            <TouchableOpacity onPress={handleLogin}>
+              <Text style={styles.loginLink}>Log in</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Animated.View>
+
+      {/* SPLASH SCREEN OVERLAY */}
+      {showSplash && (
+        <Animated.View 
+          style={[
+            styles.splashOverlay,
+            { transform: [{ translateY: splashTranslateY }] }
+          ]}
+        >
+          {/* Top Logo */}
+          <Animated.View style={[
+            styles.splashLogo,
+            { 
+              opacity: logoOpacity,
+              transform: [{ translateY: logoTranslateY }]
+            }
+          ]}>
+            <View style={styles.splashLogoIcon}>
+              <BoltIcon size={24} color="#FFFFFF" />
+            </View>
+            <Text style={styles.splashLogoText}>PayGam Merchant</Text>
+          </Animated.View>
+
+          {/* Slides Container */}
+          <View style={styles.slidesContainer}>
+            {/* Slide 1 */}
+            <Animated.View style={[
+              styles.slide,
+              {
+                opacity: slide1Opacity,
+                transform: [{ translateX: slide1TranslateX }],
+              }
+            ]}>
+              <View style={styles.slideIconContainer}>
+                <View style={styles.slideIconPing} />
+                <ChartPieIcon size={48} color="#93C5FD" />
+              </View>
+              <Text style={styles.slideTitle}>Real-time Analytics</Text>
+              <Text style={styles.slideDesc}>
+                Monitor your daily sales, track inventory, and grow your business with powerful insights.
+              </Text>
+            </Animated.View>
+
+            {/* Slide 2 */}
+            <Animated.View style={[
+              styles.slide,
+              styles.slideAbsolute,
+              {
+                opacity: slide2Opacity,
+                transform: [{ translateX: slide2TranslateX }],
+              }
+            ]}>
+              <View style={styles.slideIconContainer}>
+                <ShieldIcon size={48} color="#86EFAC" />
+              </View>
+              <Text style={styles.slideTitle}>Secure Payments</Text>
+              <Text style={styles.slideDesc}>
+                Accept payments securely from anywhere. Fast settlements directly to your bank.
+              </Text>
+            </Animated.View>
+          </View>
+
+          {/* Indicators & Loading */}
+          <View style={styles.indicatorsContainer}>
+            {/* Dots */}
+            <View style={styles.dotsRow}>
+              <View style={[
+                styles.dot,
+                currentSlide === 0 ? styles.dotActive : styles.dotInactive
+              ]} />
+              <View style={[
+                styles.dot,
+                currentSlide === 1 ? styles.dotActive : styles.dotInactive
+              ]} />
             </View>
 
-            {/* Content */}
-            <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-                {/* Spacer */}
-                <View style={{ flex: 1 }} />
-
-                {/* Logo Section */}
-                <View style={styles.logoSection}>
-                    {/* Logo with glow effect */}
-                    <View style={styles.logoWrapper}>
-                        <View style={styles.logoGlow} />
-                        <Animated.View style={[styles.logoBox, { transform: [{ scale: pulseAnim }, { rotate: '3deg' }] }]}>
-                            <View style={{ transform: [{ rotate: '-3deg' }] }}>
-                                <ShieldIcon size={60} color="#FFFFFF" />
-                            </View>
-                        </Animated.View>
-                        {/* Status dot */}
-                        <View style={styles.statusDot} />
-                    </View>
-
-                    {/* App Name */}
-                    <View style={styles.titleContainer}>
-                        <Text style={styles.appName}>LIVE</Text>
-                        <Text style={styles.appSubtitle}>RESPONSE</Text>
-                    </View>
-
-                    {/* Tagline */}
-                    <Text style={styles.tagline}>Advanced Security & Surveillance Systems</Text>
-                </View>
-
-                {/* Spacer */}
-                <View style={{ flex: 1 }} />
-
-                {/* Bottom Section */}
-                <View style={styles.bottomSection}>
-                    {/* Loading Bar */}
-                    <View style={styles.loadingContainer}>
-                        <View style={styles.loadingTrack}>
-                            <Animated.View style={[styles.loadingBar, { transform: [{ translateX: loadingTranslate }] }]}>
-                                <LinearGradient
-                                    colors={['rgba(96, 165, 250, 0)', '#FFFFFF', 'rgba(96, 165, 250, 0)']}
-                                    start={{ x: 0, y: 0 }}
-                                    end={{ x: 1, y: 0 }}
-                                    style={{ flex: 1, borderRadius: 999 }}
-                                />
-                            </Animated.View>
-                        </View>
-                        <View style={styles.loadingLabels}>
-                            <Text style={styles.loadingText}>SYSTEM CHECK</Text>
-                            <Text style={[styles.loadingText, { opacity: 0.7 }]}>LOADING...</Text>
-                        </View>
-                    </View>
-
-                    {/* Version & Secure Badge */}
-                    <View style={styles.footer}>
-                        <Text style={styles.versionText}>v1.0.1 (Build 2)</Text>
-                        <View style={styles.secureBadge}>
-                            <LockIcon size={10} color="#FFFFFF" />
-                            <Text style={styles.secureText}>Secure Connection</Text>
-                        </View>
-                    </View>
-                </View>
-            </Animated.View>
-        </View>
-    );
+            {/* Loading Bar */}
+            <View style={styles.loadingBarContainer}>
+              <Animated.View 
+                style={[
+                  styles.loadingBar,
+                  {
+                    width: loadingWidth.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0%', '100%'],
+                    }),
+                  }
+                ]} 
+              />
+            </View>
+          </View>
+        </Animated.View>
+      )}
+    </View>
+  );
 };
 
+// ==================== STYLES ====================
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#1E40AF',
-    },
-    content: {
-        flex: 1,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 32,
-        zIndex: 10,
-    },
-    logoSection: {
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    logoWrapper: {
-        position: 'relative',
-        marginBottom: 32,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    logoGlow: {
-        position: 'absolute',
-        width: 140,
-        height: 140,
-        borderRadius: 70,
-        backgroundColor: 'rgba(96, 165, 250, 0.3)',
-    },
-    logoBox: {
-        width: 128,
-        height: 128,
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        borderColor: 'rgba(255, 255, 255, 0.2)',
-        borderWidth: 1,
-        borderRadius: 24,
-        alignItems: 'center',
-        justifyContent: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
-        shadowRadius: 20,
-        elevation: 10,
-    },
-    statusDot: {
-        position: 'absolute',
-        top: -4,
-        right: -4,
-        width: 16,
-        height: 16,
-        backgroundColor: '#4ADE80',
-        borderColor: '#1E40AF',
-        borderWidth: 2,
-        borderRadius: 8,
-    },
-    titleContainer: {
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    appName: {
-        fontSize: 40,
-        fontWeight: '900',
-        color: '#FFFFFF',
-        letterSpacing: -1,
-        textShadowColor: 'rgba(0, 0, 0, 0.2)',
-        textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 4,
-    },
-    appSubtitle: {
-        fontSize: 20,
-        fontWeight: '700',
-        color: '#BFDBFE',
-        letterSpacing: 8,
-        textTransform: 'uppercase',
-        marginTop: 4,
-    },
-    tagline: {
-        marginTop: 16,
-        color: '#DBEAFE',
-        fontSize: 14,
-        fontWeight: '500',
-        textAlign: 'center',
-        opacity: 0.9,
-    },
-    bottomSection: {
-        width: '100%',
-        paddingBottom: 48,
-        alignItems: 'center',
-    },
-    loadingContainer: {
-        width: '100%',
-        alignItems: 'center',
-        marginBottom: 24,
-    },
-    loadingTrack: {
-        width: '100%',
-        height: 6,
-        backgroundColor: 'rgba(30, 58, 138, 0.5)',
-        borderRadius: 999,
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.05)',
-        marginBottom: 8,
-    },
-    loadingBar: {
-        width: '60%',
-        height: '100%',
-        borderRadius: 999,
-    },
-    loadingLabels: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-    },
-    loadingText: {
-        fontSize: 10,
-        fontWeight: '600',
-        color: '#93C5FD',
-        textTransform: 'uppercase',
-        letterSpacing: 1,
-    },
-    footer: {
-        alignItems: 'center',
-    },
-    versionText: {
-        fontSize: 10,
-        color: 'rgba(147, 197, 253, 0.6)',
-        fontFamily: 'monospace',
-    },
-    secureBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 8,
-        opacity: 0.5,
-        gap: 6,
-    },
-    secureText: {
-        fontSize: 10,
-        color: '#FFFFFF',
-        fontWeight: '500',
-        marginLeft: 4,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  
+  // Main Content Styles
+  mainContent: {
+    flex: 1,
+  },
+  header: {
+    paddingTop: 48,
+    paddingBottom: 24,
+    paddingHorizontal: 24,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+  },
+  logoIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#293454',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoText: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#293454',
+    letterSpacing: -0.5,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#111827',
+    marginTop: 8,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 4,
+    lineHeight: 20,
+  },
+  
+  scrollContent: {
+    flex: 1,
+    padding: 24,
+  },
+  optionsContainer: {
+    gap: 16,
+  },
+  optionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    gap: 16,
+    marginBottom: 16,
+  },
+  optionCardSelected: {
+    borderColor: '#293454',
+    backgroundColor: 'rgba(41, 52, 84, 0.05)',
+  },
+  optionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  optionInfo: {
+    flex: 1,
+  },
+  optionName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+  optionDesc: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  radioOuter: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#D1D5DB',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioOuterSelected: {
+    borderColor: '#293454',
+    backgroundColor: '#293454',
+  },
+  
+  bottomAction: {
+    padding: 24,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+  },
+  continueButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#293454',
+    paddingVertical: 16,
+    borderRadius: 16,
+    gap: 8,
+    shadowColor: '#1E3A5F',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  continueButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  loginPrompt: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 16,
+  },
+  loginText: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  loginLink: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#293454',
+  },
+  
+  // Splash Overlay Styles
+  splashOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#293454',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 48,
+    zIndex: 50,
+  },
+  splashLogo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 32,
+  },
+  splashLogoIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  splashLogoText: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: -0.5,
+  },
+  
+  slidesContainer: {
+    width: width,
+    height: 256,
+    position: 'relative',
+  },
+  slide: {
+    width: width,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+  },
+  slideAbsolute: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  slideIconContainer: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  slideIconPing: {
+    position: 'absolute',
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  slideTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  slideDesc: {
+    fontSize: 14,
+    color: '#BFDBFE',
+    textAlign: 'center',
+    lineHeight: 22,
+    maxWidth: 280,
+  },
+  
+  indicatorsContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
+    gap: 24,
+    width: '100%',
+    paddingHorizontal: 32,
+  },
+  dotsRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  dot: {
+    height: 8,
+    borderRadius: 4,
+  },
+  dotActive: {
+    width: 32,
+    backgroundColor: '#FFFFFF',
+  },
+  dotInactive: {
+    width: 8,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+  },
+  loadingBarContainer: {
+    width: 200,
+    height: 4,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 2,
+    overflow: 'hidden',
+    marginTop: 16,
+  },
+  loadingBar: {
+    height: '100%',
+    backgroundColor: '#60A5FA',
+    borderRadius: 2,
+  },
 });
 
 export default SplashScreenSimple;

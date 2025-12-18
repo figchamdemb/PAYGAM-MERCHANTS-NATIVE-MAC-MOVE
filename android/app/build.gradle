@@ -72,13 +72,13 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.egovgambia.patrol"
+    namespace "com.paygam.merchant"
     defaultConfig {
-        applicationId "com.egovgambia.patrol"
+        applicationId "com.paygam.merchant"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 6
-        versionName "1.0.6"
+        versionCode 1
+        versionName "1.0.0"
 
         // Include ARM ABIs for real devices
         ndk {
